@@ -1,0 +1,40 @@
+// other
+public void RenderLine(Vector3 v0, Vector3 v1, Vector3 offset, bool shortest_path=true, int points_n=20, float width=0.05f) {
+    float t = 0;
+    float dt = 1f / (points_n - 1);
+    Vector3[] points = new Vector3[points_n];
+
+    if (shortest_path) {
+        for (int n = 0; n < points_n; n++) {
+            points[n] = (Vector3.Lerp(v0, v1, t).normalized * (v0.magnitude + (width * 0.5f))) + offset;
+            t += dt;
+        }
+    } else {
+        Vector3 mid_vector = -(Vector3.Lerp(v0, v1, 0.5f).normalized * v0.magnitude);
+
+        for (int n = 0; n < points_n; n++) {
+
+            if (t <= 0.5) {
+                points[n] = (Vector3.Lerp(v0, mid_vector, t * 2).normalized * (v0.magnitude + (width * 0.5f))) + offset;
+            } else {
+                points[n] = (Vector3.Lerp(mid_vector, v1, (t - 0.5f) * 2).normalized * (v0.magnitude + (width * 0.5f))) + offset;
+            }
+
+            t += dt;
+        }
+    }
+
+    GameObject lineObject = new GameObject("Line" + this.lines_n.ToString());
+    LineRenderer line = lineObject.AddComponent(typeof(LineRenderer)) as LineRenderer;
+    
+    line.startWidth = width;
+    line.endWidth = width;
+    Material material = new Material(Shader.Find("Unlit/SingleColorShader"));
+    material.SetColor("_Color", this.lines_color);
+    line.material = material;
+
+    line.positionCount = points_n;
+    line.SetPositions(points);
+
+    this.lines_n++;
+}
