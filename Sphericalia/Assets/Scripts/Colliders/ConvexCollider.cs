@@ -9,9 +9,11 @@ public class ConvexCollider
     Vector3[] normals;
     Vector3[] mids;
 
-    Color c;
+    public Color c;
     public TriangleS[] triangles;
     public QuadS[] quads;
+
+    SphericalUtilities su = new SphericalUtilities();
 
     public ConvexCollider(Vector3[] points_, Color c_) {
         points = (Vector3[])points_.Clone();
@@ -33,6 +35,18 @@ public class ConvexCollider
         ComputeNormalsAndMids();
 
         ComputeObjects();
+    }
+
+    // clones passed collider to self
+    public void BeClone(ConvexCollider c_) {
+        center = c_.center;
+        points = c_.points;
+        normals = c_.normals;
+        mids = c_.mids;
+
+        c = c_.c;
+        triangles = c_.triangles;
+        quads = c_.quads;
     }
 
     public void MoveRotate(Quaternion q) {
@@ -161,6 +175,16 @@ public class ConvexCollider
         }
 
         return true;
+    }
+
+    public bool CollideCircle(Vector3 center, float r) {
+        if (CollidePoint(center)) {return true;}
+
+        for (int i = 0; i < points.Length; i++) {
+            if(su.CircleLineCollision(center, r, points[i], points[(i+1) % points.Length])) {return true;}
+        }
+
+        return false;
     }
 }
 

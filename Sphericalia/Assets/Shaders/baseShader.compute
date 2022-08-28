@@ -33,13 +33,14 @@ struct Quad {
 
 // objects
 StructuredBuffer<Circle> circles;
-uint cLength;
 
 StructuredBuffer<Triangle> triangles;
-uint tLength;
 
 StructuredBuffer<Quad> quads;
-uint qLength;
+
+// layers
+StructuredBuffer<float3> layers;
+uint layLength;
 
 // bg
 float4 bgColor;
@@ -113,22 +114,24 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 finalColor = getBgColor(raySph);
     bool collided = false;
 
-    // circles
-    for (int i = 0; i < cLength; i++) {
-        collided = collidePointCircle(ray, circles[i]);
-        finalColor = (collided * circles[i].color) + (!collided * finalColor);
-    }
+    for (int u = 0; u < layLength; u++) {
+        // circles
+        for (int i = layers[u][0]; i < (int)layers[u+1][0]; i++) {
+            collided = collidePointCircle(ray, circles[i]);
+            finalColor = (collided * circles[i].color) + (!collided * finalColor);
+        }
 
-    // triangles
-    for (int j = 0; j < tLength; j++) {
-        collided = collidePointTriangle(ray, triangles[j]);
-        finalColor = (collided * triangles[j].color) + (!collided * finalColor);
-    }
+        // triangles
+        for (int j = layers[u][1]; j < (int)layers[u+1][1]; j++) {
+            collided = collidePointTriangle(ray, triangles[j]);
+            finalColor = (collided * triangles[j].color) + (!collided * finalColor);
+        }
 
-    // quads
-    for (int k = 0; k < qLength; k++) {
-        collided = collidePointQuad(ray, quads[k]);
-        finalColor = (collided * quads[k].color) + (!collided * finalColor);
+        // quads
+        for (int k = layers[u][2]; k < (int)layers[u+1][2]; k++) {
+            collided = collidePointQuad(ray, quads[k]);
+            finalColor = (collided * quads[k].color) + (!collided * finalColor);
+        }
     }
 
     // checking if ray out

@@ -12,6 +12,8 @@ public class QuadCollider
 
     public QuadS q;
 
+    SphericalUtilities su = new SphericalUtilities();
+
     public QuadCollider(Vector3[] verts, Color c_) {
         c = c_;
         points = (Vector3[])verts.Clone();
@@ -91,6 +93,16 @@ public class QuadCollider
         }
 
         return true;
+    }
+
+    public bool CollideCircle(Vector3 center, float r) {
+        if (CollidePoint(center)) {return true;}
+
+        for (int i = 0; i < points.Length; i++) {
+            if(su.CircleLineCollision(center, r, points[i], points[(i+1) % points.Length])) {return true;}
+        }
+
+        return false;
     }
 }
 

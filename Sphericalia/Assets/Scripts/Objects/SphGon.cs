@@ -5,7 +5,10 @@ using UnityEngine;
 [ExecuteAlways]
 public class SphGon : MonoBehaviour
 {
+    public int layer = 0;
     public bool Static = true;
+    public bool isCollider = false;
+    public bool isTrigger = false;
     [Range(3, 20)] public int n = 5;
     public Vector2 sphPosition = new Vector2();
     [Range(-180, 180)] public float rotation = 0;
@@ -16,6 +19,8 @@ public class SphGon : MonoBehaviour
     [HideInInspector] public Vector3[] vertices;
 
     [HideInInspector] public ConvexCollider collider_;
+
+    [HideInInspector] public bool triggered = false;
 
     SphericalUtilities su = new SphericalUtilities();
 
@@ -58,7 +63,9 @@ public class SphGon : MonoBehaviour
 
     void OnEnable() {
         SphSpaceManager.sphGons.Add(this);
-        transform.parent = GameObject.Find("___SphericalSpace___").transform;
+        if (transform.parent == null) {
+            transform.parent = GameObject.Find("___SphericalSpace___").transform;
+        }
         GetDefaultSetup();
         transform.position = position;
     }
@@ -70,6 +77,7 @@ public class SphGon : MonoBehaviour
     void Start()
     {
         collider_ = new ConvexCollider(vertices, color);
+        if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
     }
 
     // Update is called once per frame

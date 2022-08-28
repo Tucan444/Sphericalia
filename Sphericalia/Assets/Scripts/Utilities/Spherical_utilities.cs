@@ -7,14 +7,59 @@ using UnityEditor;
 
 public class SphericalUtilities : SphericalAdder{
 
+    // returns spherical distance
     public float SphDistance(Vector3 a, Vector3 b) {
         return Mathf.Acos(Vector3.Dot(a, b));
     }
     
+    // lerps between a b in spherical space
     public Vector3 SphLerp(Vector3 a, Vector3 b, float t) {
         float d = Mathf.Acos(Vector3.Dot(a, b)) * t;
         Quaternion q = Quaternion.AngleAxis(Rad2Deg * d, Vector3.Cross(a, b));
         return q * a;
+    }
+
+    // returns quaternion that does lerping
+    public Quaternion LerpQuaternion(Vector3 a, Vector3 b, float t) {
+        float d = Mathf.Acos(Vector3.Dot(a, b)) * t;
+        Quaternion q = Quaternion.AngleAxis(Rad2Deg * d, Vector3.Cross(a, b));
+        return q;
+    }
+
+    // checks collisions between line and circle on sphere
+    public bool CircleLineCollision(Vector3 center, float r, Vector3 a, Vector3 b) {
+        if (SphDistance(center, a) <= r) {return true;}
+        if (SphDistance(center, b) <= r) {return true;}
+        Quaternion q = LerpQuaternion(a, new Vector3(1, 0, 0), 1);
+        a = q * a;
+        b = q * b;
+
+        Quaternion qq;
+        if (Cartesian2Spherical(b)[1] >= 0) {
+            qq = Quaternion.AngleAxis(Rad2Deg * GetAngleBetween(b, a, Spherical2Cartesian(new Vector2(1, 0))), a);
+        } else {
+            qq = Quaternion.AngleAxis(Rad2Deg * -GetAngleBetween(b, a, Spherical2Cartesian(new Vector2(1, 0))), a);
+        }
+
+        center = qq * (q * center);
+        a = qq * a;
+        b = qq * b;
+
+        Vector2 cspher = Cartesian2Spherical(center);
+
+        if (Mathf.Abs(cspher.y) > r) {return false;}
+
+        Vector2 circleLine = CrampSpherical(new Vector2(cspher.x, 0));
+        Vector2 line = CrampSpherical(new Vector2(Cartesian2Spherical(a).x, Cartesian2Spherical(b).x));
+
+        if (Mathf.Abs(line.x - line.y) > Mathf.PI) { // correction for ring space
+            if (line.x < 0) {line.x += TAU;}
+            if (line.y < 0) {line.y += TAU;}
+            if (circleLine.x < 0) {circleLine.x += TAU;}
+        }
+
+        if (Mathf.Min(line.x, line.y) < circleLine.x && circleLine.x < Mathf.Max(line.x, line.y)) {return true;}
+        return false;
     }
 
     // calculates default normal for spherical coordinates
@@ -22,7 +67,7 @@ public class SphericalUtilities : SphericalAdder{
         return (new Vector3(0, 1.0f / Vector3.Dot(new Vector3(0, 1, 0), v), 0) - v).normalized;
     }
 
-    // returns points on line
+    // returns points on line on sphere
     public Vector3[] GetLinePoints(Vector3 v0, Vector3 v1, int points_n=20, bool shortest_path=true) {
         float length = Mathf.Acos(Vector3.Dot(v0, v1));
         if (shortest_path == false) {

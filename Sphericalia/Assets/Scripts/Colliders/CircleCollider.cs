@@ -21,6 +21,11 @@ public class CircleCollider
         return (Mathf.Acos(Vector3.Dot(center, p)) < r);
     }
 
+    public bool CollideCircle(Vector3 center_, float r_) {
+        float d = Mathf.Acos(Vector3.Dot(center, center_));
+        if (d <= r_ + r) {return true;} else {return false;}
+    }
+
     public void Update(Vector3 center_, float r_, Color c) {
         center = center_;
         r = r_;

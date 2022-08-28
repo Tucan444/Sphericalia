@@ -364,6 +364,7 @@
 "Assets/Scripts/Old/SphericalBackground.cs"
 "Assets/Scripts/SphSpaceManager.cs"
 "Assets/Scripts/test.cs"
+"Assets/Scripts/Utilities/Comparers.cs"
 "Assets/Scripts/Utilities/SphericalAdder.cs"
 "Assets/Scripts/Utilities/SphericalConverter.cs"
 "Assets/Scripts/Utilities/Spherical_utilities.cs"

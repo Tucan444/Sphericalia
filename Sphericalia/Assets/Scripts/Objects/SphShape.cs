@@ -5,7 +5,10 @@ using UnityEngine;
 [ExecuteAlways]
 public class SphShape : MonoBehaviour
 {
+    public int layer = 0;
     public bool Static = true;
+    public bool isCollider = false;
+    public bool isTrigger = false;
     public Vector2 sphPosition = new Vector2();
     public Vector2[] polarVertices = new Vector2[6] {
         new Vector2(1, 0),
@@ -29,6 +32,8 @@ public class SphShape : MonoBehaviour
     [HideInInspector] public bool isQuad = false;
     [HideInInspector] public UnconvexCollider collider_;
     [HideInInspector] public QuadCollider qcollider;
+
+    [HideInInspector] public bool triggered = false;
 
     SphericalUtilities su = new SphericalUtilities();
 
@@ -90,6 +95,7 @@ public class SphShape : MonoBehaviour
 
     void Start() {
         if (isQuad) {qcollider = new QuadCollider(vertPos, color);} else {collider_ = new UnconvexCollider(vertPos, color);}
+        if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
     }
 
     void Warning() {

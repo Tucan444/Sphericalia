@@ -5,7 +5,10 @@ using UnityEditor;
 
 public class UVTiles : MonoBehaviour
 {
+    public int layer = 0;
     public bool Static = true;
+    public bool isCollider = false;
+    public bool isTrigger = false;
     public Vector2 sphPosition = new Vector2();
     [Range(-180.0f, 180.0f)] public float rotation = 0.001f;
     public Color color =  new Color(0.69f, 0.48f, 0.41f, 1);
@@ -104,7 +107,10 @@ public class UVTiles : MonoBehaviour
         GameObject child = new GameObject("filler "+ (i + (j * tiles.width)).ToString());
         SphShape ss = child.AddComponent(typeof(SphShape)) as SphShape;
         Undo.RecordObject(ss, "Created tile");
+        ss.layer = layer;
         ss.Static = Static;
+        ss.isCollider = isCollider;
+        ss.isTrigger = isTrigger;
         ss.sphPosition = center;
         ss.color = color;
         ss.polarVertices = new Vector2[polarCorners.Length];
@@ -186,7 +192,10 @@ public class UVTiles : MonoBehaviour
         GameObject child = new GameObject((i + (j * tiles.width)).ToString());
         SphShape ss = child.AddComponent(typeof(SphShape)) as SphShape;
         Undo.RecordObject(ss, "Created tile");
+        ss.layer = layer;
         ss.Static = Static;
+        ss.isCollider = isCollider;
+        ss.isTrigger = isTrigger;
         ss.sphPosition = center;
         ss.color = color;
         ss.polarVertices = new Vector2[4] {polarCorners[0], polarCorners[1], polarCorners[2], polarCorners[3]};
@@ -209,10 +218,6 @@ public class UVTiles : MonoBehaviour
         transform.position = position;
     }
 
-    void OnDisable() {
-        DestroyChildren();
-    }
-
     void OnDrawGizmosSelected() {
         Gizmos.DrawWireSphere(position, 0.2f);
     }
@@ -222,6 +227,11 @@ public class UVTiles : MonoBehaviour
         foreach (Transform child in allChildren) { //var child : Transform in allChildren.
             if (child != transform) {
                 StartCoroutine(Destroy(child.gameObject));
+                if (Application.isPlaying) {
+                    SphShape ss = child.gameObject.GetComponent<SphShape>();
+                    ss.position.x = 10;
+                    Destroy(child.gameObject.GetComponent<SphShape>());
+                }
             }
         }
     }
@@ -232,9 +242,24 @@ public class UVTiles : MonoBehaviour
         DestroyImmediate(go);
      }
 
-     void Start() {
-        shapes = GetComponentsInChildren<SphShape>();
-     }
+    void Start() {
+        SphShape[] shapes_ = GetComponentsInChildren<SphShape>();
+        int valid = 0;
+        for (int i = 0; i < shapes_.Length; i++) {
+            if (shapes_[i].position.x != 10) { valid++;}
+        }
+        shapes = new SphShape[valid];
+
+        int j = 0;
+        for (int i = 0; i < shapes_.Length; i++) {
+            if (shapes_[i].position.x != 10) { shapes[j] = shapes_[i]; j++;}
+        }
+        Debug.Log(shapes.Length);
+    }
+
+    void Update() {
+    }
+        
 
     public void Rotate(float angle) {
         Quaternion q = Quaternion.AngleAxis(-angle, position);

@@ -49,11 +49,11 @@ public class SphericalAdder : SphericalConverter
         for (int i = 0; i < 2; i++) {
             if (s[i] > Mathf.PI) {
                 while (s[i] > Mathf.PI) {
-                    s[i] -= Mathf.PI * 2;
+                    s[i] -= TAU;
                 }
             } else if (s[i] < -Mathf.PI) {
                 while (s[i] < -Mathf.PI) {
-                    s[i] += Mathf.PI * 2;
+                    s[i] += TAU;
                 }
             }
         }

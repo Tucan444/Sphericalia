@@ -7,6 +7,7 @@ public class SphericalConverter
 {
     public float Rad2Deg = 180.0f / Mathf.PI;
     public float TAU = 2 * Mathf.PI;
+    public float HalfPI = Mathf.PI * 0.5f;
 
     // converts spherical position to cartesian
     public Vector3 Spherical2Cartesian(Vector2 v){ // working

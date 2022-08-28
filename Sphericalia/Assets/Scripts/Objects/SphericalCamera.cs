@@ -16,6 +16,9 @@ public class SphericalCamera : MonoBehaviour
     [SerializeField][Range(0.01f, 360)]public float turnSpeed = 45;
     [SerializeField] public float width = 1.2f;
     [SerializeField][Range(0.1f, 3)]public float screenSpeed = 1;
+    public bool isCollider = true;
+    public bool triggers = true;
+    [Range(0, Mathf.PI)] public float colliderR = 0.1f;
     public bool pinScreenToPlayer = false;
     public bool noWidthControl = false;
 
@@ -32,6 +35,7 @@ public class SphericalCamera : MonoBehaviour
     [HideInInspector] public Vector3[] sendRays;
     Vector3[] corners;
 
+    SphSpaceManager ssm;
     SphericalUtilities su = new SphericalUtilities();
 
     Vector2 playerInput = new Vector2();
@@ -90,10 +94,6 @@ public class SphericalCamera : MonoBehaviour
         }
     }
 
-    void GetCorners() {
-
-    }
-
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -101,6 +101,7 @@ public class SphericalCamera : MonoBehaviour
         transform.position = position;
 
         SphSpaceManager.sc = this;
+        ssm = GameObject.Find("___SphericalSpace___").GetComponent<SphSpaceManager>();
     }
 
     void OnValidate() {
@@ -149,6 +150,15 @@ public class SphericalCamera : MonoBehaviour
             Gizmos.DrawLine(screenQ * corners[1], screenQ * corners[3]);
             Gizmos.DrawLine(screenQ * corners[2], screenQ * corners[0]);
             Gizmos.DrawLine(screenQ * corners[3], screenQ * corners[2]);
+        }
+
+        if (isCollider) {
+            Gizmos.color = Color.green * 1.4f;
+            su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), colliderR));
+            Gizmos.color = Color.green * 1.2f;
+            su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), colliderR * 0.9f));
+            Gizmos.color = Color.green;
+            su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), colliderR * 0.8f));
         }
     }
 
@@ -248,8 +258,14 @@ public class SphericalCamera : MonoBehaviour
     void Update()
     {
         transform.position = position;
-        Move(playerInput[1] * speed * Time.deltaTime);
+        if (isCollider) {
+            MoveWithCollision(playerInput[1] * speed * Time.deltaTime);
+        } else {Move(playerInput[1] * speed * Time.deltaTime);}
         Rotate(playerInput[0] * turnSpeed * Time.deltaTime);
+
+        if (triggers) {
+            ssm.CollideTriggerCircle(position, colliderR);
+        }
     }
 
     public void Move(float rAngle) {
@@ -265,6 +281,43 @@ public class SphericalCamera : MonoBehaviour
             screenQ = Quaternion.Lerp(screenQ, totalQ, Mathf.Min((0.1f * speed) * screenSpeed * screenSpeed * Time.deltaTime, 1));
         }
 
+    }
+
+    public void MoveWithCollision(float rAngle) {
+        Quaternion[] rotQ = new Quaternion[2] {
+            Quaternion.AngleAxis(90, position),
+            Quaternion.AngleAxis(60, position)
+        };
+        moveQ = Quaternion.AngleAxis(rAngle, Vector3.Cross(position, direction));
+        Quaternion moveQ1 = Quaternion.AngleAxis(rAngle*0.5f, Vector3.Cross(position, rotQ[0] * direction));
+        Quaternion moveQ2 = Quaternion.AngleAxis(rAngle*0.75f, Vector3.Cross(position, rotQ[1] * direction));
+        Quaternion moveQ3 = Quaternion.AngleAxis(-rAngle*0.75f, Vector3.Cross(position, rotQ[1] * direction));
+        Quaternion moveQ4 = Quaternion.AngleAxis(-rAngle*0.5f, Vector3.Cross(position, rotQ[0] * direction));
+        bool[] checks = new bool[5] {CheckMove(moveQ1), CheckMove(moveQ2), CheckMove(moveQ, triggers), CheckMove(moveQ3), CheckMove(moveQ4)};
+
+        if (checks[2]) {
+            if (checks[0] && checks[1] && checks[3] && checks[4]) {
+                return;
+            } else if (!checks[1]) {moveQ = moveQ2;
+            } else if (!checks[3]) {moveQ = moveQ3;
+            } else if (!checks[0]) {moveQ = moveQ1;
+            } else {moveQ = moveQ4;}
+        }
+        
+        position = moveQ * position;
+        direction = moveQ * direction;
+
+        totalQ = moveQ * totalQ;
+        if (pinScreenToPlayer) {
+            screenQ = totalQ;
+        } else {
+            screenQ = Quaternion.Lerp(screenQ, totalQ, Mathf.Min((0.1f * speed) * screenSpeed * screenSpeed * Time.deltaTime, 1));
+        }
+    }   
+
+    bool CheckMove(Quaternion q, bool triggerStuff=false) {
+        Vector3 movedP = q * position;
+        return ssm.CollideCircle(movedP, colliderR, triggerStuff);
     }
 
     public void Rotate(float rAngle) {

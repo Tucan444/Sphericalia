@@ -15,7 +15,10 @@ public class AddObject : EditorWindow
     // generally used variables
     bool draw = true;
 
+    int layer = 0;
     bool Static = true;
+    bool isCollider = false;
+    bool isTrigger = false;
     string namE = "duck";
     Vector2 sphericalPosition = new Vector2();
     Color color = new Color(0.69f, 0.48f, 0.41f, 1);
@@ -45,7 +48,10 @@ public class AddObject : EditorWindow
         }
 
         draw = EditorGUILayout.Toggle("Draw: ", draw);
+        layer = EditorGUILayout.IntField("Layer: ", layer);
         Static = EditorGUILayout.Toggle("Static: ", Static);
+        isCollider = EditorGUILayout.Toggle("Is Collider: ", isCollider);
+        isTrigger = EditorGUILayout.Toggle("Is Trigger: ", isTrigger);
         namE = EditorGUILayout.TextField("Name: ", namE);
         sphericalPosition = EditorGUILayout.Vector2Field("SphPosition: ", sphericalPosition);
         color = EditorGUILayout.ColorField("Color: ", color);
@@ -62,7 +68,10 @@ public class AddObject : EditorWindow
                 GameObject obj = new GameObject(namE);
                 SphCircle sc = obj.AddComponent(typeof(SphCircle)) as SphCircle;
                 Undo.RecordObject(sc, "Configured Circle");
+                sc.layer = layer;
                 sc.Static = Static;
+                sc.isCollider = isCollider;
+                sc.isTrigger = isTrigger;
                 sc.sphPosition = sphericalPosition;
                 sc.radius = radius;
                 sc.color = color;
@@ -90,7 +99,10 @@ public class AddObject : EditorWindow
                 GameObject obj = new GameObject(namE);
                 SphGon sg = obj.AddComponent(typeof(SphGon)) as SphGon;
                 Undo.RecordObject(sg, "Configured NGon");
+                sg.layer = layer;
                 sg.Static = Static;
+                sg.isCollider = isCollider;
+                sg.isTrigger = isTrigger;
                 sg.n = ngon;
                 sg.sphPosition = sphericalPosition;
                 sg.rotation = rotation;
@@ -120,7 +132,10 @@ public class AddObject : EditorWindow
                 GameObject obj = new GameObject(namE);
                 SphShape ss = obj.AddComponent(typeof(SphShape)) as SphShape;
                 Undo.RecordObject(ss, "Configured General Shape");
+                ss.layer = layer;
                 ss.Static = Static;
+                ss.isCollider = isCollider;
+                ss.isTrigger = isTrigger;
                 ss.sphPosition = sphericalPosition;
                 ss.rotation = rotation;
                 ss.scale = scale;
@@ -141,7 +156,10 @@ public class AddObject : EditorWindow
                 GameObject obj = new GameObject(namE);
                 UVTiles uvt = obj.AddComponent(typeof(UVTiles)) as UVTiles;
                 Undo.RecordObject(uvt, "Configured UVTiles");
+                uvt.layer = layer;
                 uvt.Static = Static;
+                uvt.isCollider = isCollider;
+                uvt.isTrigger = isTrigger;
                 uvt.sphPosition = sphericalPosition;
                 uvt.rotation = rotation;
                 uvt.color = color;

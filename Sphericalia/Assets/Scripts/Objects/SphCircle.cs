@@ -5,7 +5,10 @@ using UnityEngine;
 [ExecuteAlways]
 public class SphCircle : MonoBehaviour
 {
+    public int layer = 0;
     public bool Static = true;
+    public bool isCollider = false;
+    public bool isTrigger = false;
     public Vector2 sphPosition = new Vector2();
     [Range(0.01f, -0.01f + Mathf.PI)] public float radius = 0.1f;
     public Color color =  new Color(0.69f, 0.48f, 0.41f, 1);
@@ -13,6 +16,8 @@ public class SphCircle : MonoBehaviour
     [HideInInspector] public Vector3 position = new Vector3(1, 0, 0);
 
     [HideInInspector] public CircleCollider collider_;
+
+    [HideInInspector] public bool triggered = false;
 
     SphericalUtilities su = new SphericalUtilities();
 
@@ -27,7 +32,9 @@ public class SphCircle : MonoBehaviour
 
     void OnEnable() {
         SphSpaceManager.sphCircles.Add(this);
-        this.transform.parent = GameObject.Find("___SphericalSpace___").transform;
+        if (transform.parent == null) {
+            transform.parent = GameObject.Find("___SphericalSpace___").transform;
+        }
         GetDefaultSetup();
         transform.position = position;
     }
@@ -54,6 +61,7 @@ public class SphCircle : MonoBehaviour
     void Start()
     {
         collider_ = new CircleCollider(position, radius, color);
+        if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
     }
 
     // Update is called once per frame

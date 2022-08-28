@@ -15,6 +15,8 @@ public class SphBg : MonoBehaviour
     GameObject fill;
     Material fillM;
 
+    [HideInInspector] public bool triggered = false;
+
     void OnEnable() {
         SphSpaceManager.sb = this;
         m = GetComponent<Renderer>().sharedMaterial;
@@ -31,16 +33,16 @@ public class SphBg : MonoBehaviour
     void UpdateStuff() {
         try{
         
-        fillM.mainTexture = bgTexture;
-        if (bgTexture) {
-            fillM.SetColor("_Color", new Color(1, 1, 1, 1));
-        } else {
-            fillM.SetColor("_Color", new Color(0.2f, 0.2f, 0.2f, 1));
-        }
+            fillM.mainTexture = bgTexture;
+            if (bgTexture) {
+                fillM.SetColor("_Color", new Color(1, 1, 1, 1));
+            } else {
+                fillM.SetColor("_Color", new Color(0.2f, 0.2f, 0.2f, 1));
+            }
 
-        m.SetColor("_Color", bgColor);
-        fill.transform.localScale = new Vector3(fillSize, fillSize, fillSize);
+            m.SetColor("_Color", bgColor);
+            fill.transform.localScale = new Vector3(fillSize, fillSize, fillSize);
 
-        } catch (Exception e) {Debug.Log("bg error");}
+        } catch (Exception e) {}
     }
 }
