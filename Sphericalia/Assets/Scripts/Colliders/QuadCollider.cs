@@ -31,8 +31,7 @@ public class QuadCollider
         if (empty) {q = eo.GetEmptyQuad();}
     }
 
-    public void Update(Vector3[] verts, Color c_) {
-        empty = false;
+    public void Update(Vector3[] verts, Color c_, bool empty_=false) {
         c = c_;
         points = (Vector3[])verts.Clone();
         normals = new Vector3[points.Length];
@@ -41,6 +40,9 @@ public class QuadCollider
 
         ComputeNormalsAndMids();
         CreateQuad();
+
+        empty = empty_;
+        if (empty) {q = eo.GetEmptyQuad();}
     }
 
     public void MoveRotate(Quaternion qua) {

@@ -38,8 +38,7 @@ public class UnconvexCollider
         }
     }
 
-    public void Update(Vector3[] points_, Color c_) {
-        empty = false;
+    public void Update(Vector3[] points_, Color c_, bool empty_ = false) {
         points = (Vector3[])points_.Clone();
         color = c_;
         
@@ -48,6 +47,13 @@ public class UnconvexCollider
 
         currentShapes.Add(points);
         UpdateTriangles();
+
+        empty = empty_;
+        if (empty) {
+            for (int i = 0; i < triangles.Length; i++) {
+                triangles[i] = eo.GetEmptyTriangle();
+            }
+        }
     }
 
     public void MoveRotate(Quaternion q) {

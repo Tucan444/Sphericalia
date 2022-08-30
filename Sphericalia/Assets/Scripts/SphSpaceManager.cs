@@ -8,6 +8,7 @@ public class SphSpaceManager : MonoBehaviour
 {
     public static SphBg sb;
     public static SphericalCamera sc;
+    public static Lighting lighting;
     public static List<SphCircle> sphCircles = new List<SphCircle>();
     public static List<SphGon> sphGons = new List<SphGon>();
     public static List<SphShape> sphShapes = new List<SphShape>();
@@ -39,6 +40,7 @@ public class SphSpaceManager : MonoBehaviour
     QuadS[] quads;
 
     public ComputeShader baseShader;
+    public ComputeShader realtimeLightingShader;
     private RenderTexture renderTexture;
 
     Texture2D black;
@@ -48,6 +50,9 @@ public class SphSpaceManager : MonoBehaviour
     EmptyObjects eo = new EmptyObjects();
 
     // properties
+    int ambientLightID = Shader.PropertyToID("ambientLight");
+    int lightsID = Shader.PropertyToID("lights");
+    int lLengthID = Shader.PropertyToID("lLength");
 
     int circlesID = Shader.PropertyToID("circles");
     int trianglesID = Shader.PropertyToID("triangles");
@@ -686,7 +691,7 @@ public class SphSpaceManager : MonoBehaviour
         ClearTriggered();
     }
 
-     void RenderBaseShader() {
+    void RenderBaseShader() {
 
         // sending objects
         // circles
@@ -768,9 +773,104 @@ public class SphSpaceManager : MonoBehaviour
         rays_buffer.Dispose();
     }
 
+    void RenderRealtimeLightingShader() {
+
+        // setting lighting
+        realtimeLightingShader.SetFloat(ambientLightID, lighting.ambientLight);
+        PointLightS[] lights = lighting.GetStructs();
+        ComputeBuffer lights_buffer = new ComputeBuffer(lights.Length, sizeof(float)*9); // point lights
+        lights_buffer.SetData(lights);
+        realtimeLightingShader.SetBuffer(0, lightsID, lights_buffer);
+        realtimeLightingShader.SetInt(lLengthID, lights.Length);
+
+        // sending objects
+        // circles
+        ComputeBuffer circles_buffer = new ComputeBuffer(1, sizeof(float)*8); // circles
+        circles_buffer.SetData(new CircleS[1] {eo.GetEmptyCircle()});
+        if (circles.Length > 0) {
+            circles_buffer.Dispose();
+            circles_buffer = new ComputeBuffer(circles.Length, sizeof(float)*8); // circles
+            circles_buffer.SetData(circles);
+        }
+        realtimeLightingShader.SetBuffer(0, circlesID, circles_buffer);
+
+        // triangles
+        ComputeBuffer triangles_buffer = new ComputeBuffer(1, sizeof(float)*22); // triangles
+        triangles_buffer.SetData(new TriangleS[1] {eo.GetEmptyTriangle()});
+        if (triangles.Length > 0) {
+            triangles_buffer.Dispose();
+            triangles_buffer = new ComputeBuffer(triangles.Length, sizeof(float)*22); // triangles
+            triangles_buffer.SetData(triangles);
+        }
+        realtimeLightingShader.SetBuffer(0, trianglesID, triangles_buffer);
+
+        // quads
+        ComputeBuffer quads_buffer = new ComputeBuffer(1, sizeof(float)*28); // quads
+        quads_buffer.SetData(new QuadS[1] {eo.GetEmptyQuad()});
+        if(quads.Length > 0) {
+            quads_buffer.Dispose();
+            quads_buffer = new ComputeBuffer(quads.Length, sizeof(float)*28); // quads
+            quads_buffer.SetData(quads);
+        }
+        realtimeLightingShader.SetBuffer(0, quadsID, quads_buffer);
+
+        Debug.Log("Number of circles: " + circles.Length + " Triangles: " + triangles.Length + " Quads: " + quads.Length);
+
+        // sending layers
+        ComputeBuffer layers_buffer = new ComputeBuffer(1, sizeof(float)*3); // quads
+        layers_buffer.SetData(new Vector3[1] {new Vector3(0, 0, 0)});
+        if(layers.Count > 0) {
+            layers_buffer.Dispose();
+            layers_buffer = new ComputeBuffer(layerSplits.Length, sizeof(float)*3); // quads
+            layers_buffer.SetData(layerSplits);
+        }
+        realtimeLightingShader.SetBuffer(0, layersID, layers_buffer);
+        realtimeLightingShader.SetInt(layLengthID, layers.Count);
+
+        // sending bg data
+        realtimeLightingShader.SetVector(bgColorID, sb.bgColor);
+        realtimeLightingShader.SetVector(orthoBgID, sb.orthoBg);
+        if (sb.bgTexture) {
+            realtimeLightingShader.SetBool(useBgTextureID, true);
+            realtimeLightingShader.SetTexture(0, bgTextureID, sb.bgTexture);
+            realtimeLightingShader.SetVector(bgStepID, new Vector2(tau / (float)sb.bgTexture.width, Mathf.PI / (float)sb.bgTexture.height));
+        } else {
+            realtimeLightingShader.SetBool(useBgTextureID, false);
+            realtimeLightingShader.SetTexture(0, bgTextureID, black);
+            realtimeLightingShader.SetVector(bgStepID, new Vector2(0, 0));
+        }
+
+        // sending rays
+        realtimeLightingShader.SetMatrix(screenQID, Matrix4x4.TRS(new Vector3(), sc.screenQ, new Vector3(1, 1, 1)));
+
+        ComputeBuffer rays_buffer = new ComputeBuffer(sc.sendRays.Length, sizeof(float)*3);
+        rays_buffer.SetData(sc.sendRays);
+        realtimeLightingShader.SetBuffer(0, sendRaysID, rays_buffer);
+
+        realtimeLightingShader.SetInts(resolutionID, sc.resolution);
+
+        // sending texture
+        realtimeLightingShader.SetTexture(0, resultID, renderTexture);
+
+        // dispatching
+        realtimeLightingShader.Dispatch(0, sc.resolution[0] / 32, sc.resolution[1] / 32, 1);
+
+        // disposing of buffers
+        lights_buffer.Dispose();
+        circles_buffer.Dispose();
+        triangles_buffer.Dispose();
+        quads_buffer.Dispose();
+        layers_buffer.Dispose();
+        rays_buffer.Dispose();
+    }
+
     private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
-        RenderBaseShader();
+        if (!lighting.useLighting) {
+            RenderBaseShader();
+        } else {
+            RenderRealtimeLightingShader();
+        }
         Graphics.Blit(renderTexture, dest);
     }
 }

@@ -35,13 +35,18 @@ public class CircleCollider
         if (d <= r_ + r) {return true && !empty;} else {return false;}
     }
 
-    public void Update(Vector3 center_, float r_, Color c) {
+    public void Update(Vector3 center_, float r_, Color c, bool empty_ = false) {
         center = center_;
         r = r_;
         circleS.center = center;
         circleS.r = r;
         circleS.color = c;
-        empty = false;
+        
+        empty = empty_;
+
+        if (empty) {
+            circleS = eo.GetEmptyCircle();
+        }
     }
 }
 

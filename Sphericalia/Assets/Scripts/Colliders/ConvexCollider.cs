@@ -40,8 +40,7 @@ public class ConvexCollider
         }
     }
 
-    public void Update(Vector3[] points_, Color c_) {
-        empty = false;
+    public void Update(Vector3[] points_, Color c_, bool empty_=false) {
         points = (Vector3[])points_.Clone();
         mids = new Vector3[points.Length];
         normals = new Vector3[points.Length];
@@ -50,6 +49,17 @@ public class ConvexCollider
         ComputeNormalsAndMids();
 
         ComputeObjects();
+
+        empty = empty_;
+        if (empty) {
+            for (int i = 0; i < triangles.Length; i++) {
+                triangles[i] = eo.GetEmptyTriangle();
+            }
+            for (int i = 0; i < quads.Length; i++)
+            {
+                quads[i] = eo.GetEmptyQuad();
+            }   
+        }
     }
 
     // clones passed collider to self
