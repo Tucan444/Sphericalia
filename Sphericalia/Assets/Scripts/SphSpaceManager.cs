@@ -148,7 +148,7 @@ public class SphSpaceManager : MonoBehaviour
         // ngons
         for (int j = 0; j < sphGons.Count; j++) {
             if (sphGons[j].Static) {
-                staticSplit[2]++;
+                staticSplit[1]++;
             }
             sphGonsS.Add(sphGons[j]);
         }
@@ -242,76 +242,18 @@ public class SphSpaceManager : MonoBehaviour
         }
     }
 
-    void SortColliderTrigger() {
-        // circles
-        for (int j = 0; j < sphCircles.Count; j++) {
-            if (sphCircles[j].isCollider) {
-                circleC.Add(sphCircles[j]);
-            }
-            if (sphCircles[j].isTrigger) {
-                cTrigger.Add(sphCircles[j]);
-            }
-        }
-
-        // ngons
-        for (int j = 0; j < sphGons.Count; j++) {
-            if (sphGons[j].isCollider) {
-                gonC.Add(sphGons[j]);
-            }
-            if (sphGons[j].isTrigger) {
-                gTrigger.Add(sphGons[j]);
-            }
-        }
-
-        // shapes
-        for (int j = 0; j < sphShapes.Count; j++) {
-            if (sphShapes[j].isCollider) {
-                shapeC.Add(sphShapes[j]);
-            }
-            if (sphShapes[j].isTrigger) {
-                sTrigger.Add(sphShapes[j]);
-            }
-        }
-    }
-
     void PopulateAll() { 
-        for (int i = 0; i < sphCirclesS.Count; i++) {
-            circles[i] = sphCirclesS[i].collider_.circleS;
-        }
+        PopulateCircles();
 
-        int processedT = 0;
-        int processedQ = 0;
-
-        for (int j = 0; j < sphGonsS.Count; j++){
-            for (int jj = 0; jj < sphGonsS[j].collider_.triangles.Length; jj++)
-            {
-                triangles[processedT] = sphGonsS[j].collider_.triangles[jj];
-                processedT++;
-            }
-            for (int jj = 0; jj < sphGonsS[j].collider_.quads.Length; jj++)
-            {
-                quads[processedQ] = sphGonsS[j].collider_.quads[jj];
-                processedQ++;
-            }
-        }
-
-        for (int j = 0; j < sphShapesS.Count; j++) {
-            if (sphShapesS[j].isQuad) {
-                quads[processedQ] = sphShapesS[j].qcollider.q;
-                processedQ++;
-            } else {
-                for (int jj = 0; jj < sphShapesS[j].collider_.triangles.Length; jj++)
-                {
-                    triangles[processedT] = sphShapesS[j].collider_.triangles[jj];
-                    processedT++;
-                }
-            }
-        }  
+        PopulateTrianglesAndQuads();  
     }
 
     void UpdateNonStatic() {
         // updating non-static objects
         int[] ti = new int[3] {staticSplit[0], staticSplit[1], staticSplit[2]};
+        /* Debug.Log("static split for circles: " + staticSplit[0]);
+        Debug.Log("static split for gons: " + staticSplit[1]);
+        Debug.Log("static split for shapes: " + staticSplit[2]); */
         for (int i = 0; i < layers.Count; i++)
         {
             Vector3 v = staticPrimitivesSplits[i];
@@ -359,6 +301,248 @@ public class SphSpaceManager : MonoBehaviour
     }
 
     // functions to use outside of class
+    
+    // use 4 functions below after making static empty objects non empty
+    public void PopulateCircles() {
+        for (int i = 0; i < sphCirclesS.Count; i++) {
+            circles[i] = sphCirclesS[i].collider_.circleS;
+        }
+    }
+
+    public void PopulateTrianglesAndQuads() {
+        int processedT = 0;
+        int processedQ = 0;
+
+        // updating non-static objects
+        int[] ti = new int[2] {0, 0};
+        for (int i = 0; i < layers.Count; i++)
+        {
+            // static
+
+            // gons
+            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i] && sphGons[ti[0]].Static) {
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
+                {
+                    triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
+                    processedT++;
+                }
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.quads.Length; jj++)
+                {
+                    quads[processedQ] = sphGonsS[ti[0]].collider_.quads[jj];
+                    processedQ++;
+                }
+
+                ti[0]++;
+            }
+
+            // shapes
+            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i] && sphShapes[ti[1]].Static) {
+                if (sphShapesS[ti[1]].isQuad) {
+                    quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
+                    processedQ++;
+                } else {
+                    for (int jj = 0; jj < sphShapesS[ti[1]].collider_.triangles.Length; jj++)
+                    {
+                        triangles[processedT] = sphShapesS[ti[1]].collider_.triangles[jj];
+                        processedT++;
+                    }
+                }
+
+                ti[1]++;
+            }
+
+            // non static
+
+            // gons
+            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i]) {
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
+                {
+                    triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
+                    processedT++;
+                }
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.quads.Length; jj++)
+                {
+                    quads[processedQ] = sphGonsS[ti[0]].collider_.quads[jj];
+                    processedQ++;
+                }
+
+                ti[0]++;
+            }
+
+            // shapes
+            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i]) {
+                if (sphShapesS[ti[1]].isQuad) {
+                    quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
+                    processedQ++;
+                } else {
+                    for (int jj = 0; jj < sphShapesS[ti[1]].collider_.triangles.Length; jj++)
+                    {
+                        triangles[processedT] = sphShapesS[ti[1]].collider_.triangles[jj];
+                        processedT++;
+                    }
+                }
+
+                ti[1]++;
+            }
+        }
+    }
+
+    public void PopulateTriangles() {
+        int processedT = 0;
+
+        // updating non-static objects
+        int[] ti = new int[2] {0, 0};
+        for (int i = 0; i < layers.Count; i++)
+        {
+            // static
+
+            // gons
+            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i] && sphGons[ti[0]].Static) {
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
+                {
+                    triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
+                    processedT++;
+                }
+
+                ti[0]++;
+            }
+
+            // shapes
+            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i] && sphShapes[ti[1]].Static) {
+                if (!sphShapesS[ti[1]].isQuad) {
+                    for (int jj = 0; jj < sphShapesS[ti[1]].collider_.triangles.Length; jj++)
+                    {
+                        triangles[processedT] = sphShapesS[ti[1]].collider_.triangles[jj];
+                        processedT++;
+                    }
+                }
+
+                ti[1]++;
+            }
+
+            // non static
+
+            // gons
+            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i]) {
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
+                {
+                    triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
+                    processedT++;
+                }
+
+                ti[0]++;
+            }
+
+            // shapes
+            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i]) {
+                if (!sphShapesS[ti[1]].isQuad) {
+                    for (int jj = 0; jj < sphShapesS[ti[1]].collider_.triangles.Length; jj++)
+                    {
+                        triangles[processedT] = sphShapesS[ti[1]].collider_.triangles[jj];
+                        processedT++;
+                    }
+                }
+
+                ti[1]++;
+            }
+        }
+    }
+
+    public void PopulateQuads() {
+        int processedQ = 0;
+
+        // updating non-static objects
+        int[] ti = new int[2] {0, 0};
+        for (int i = 0; i < layers.Count; i++)
+        {
+            // static
+
+            // gons
+            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i] && sphGons[ti[0]].Static) {
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.quads.Length; jj++)
+                {
+                    quads[processedQ] = sphGonsS[ti[0]].collider_.quads[jj];
+                    processedQ++;
+                }
+
+                ti[0]++;
+            }
+
+            // shapes
+            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i] && sphShapes[ti[1]].Static) {
+                if (sphShapesS[ti[1]].isQuad) {
+                    quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
+                    processedQ++;
+                }
+
+                ti[1]++;
+            }
+
+            // non static
+
+            // gons
+            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i]) {
+                for (int jj = 0; jj < sphGonsS[ti[0]].collider_.quads.Length; jj++)
+                {
+                    quads[processedQ] = sphGonsS[ti[0]].collider_.quads[jj];
+                    processedQ++;
+                }
+
+                ti[0]++;
+            }
+
+            // shapes
+            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i]) {
+                if (sphShapesS[ti[1]].isQuad) {
+                    quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
+                    processedQ++;
+                }
+
+                ti[1]++;
+            }
+        }
+    }
+
+    // use when object changed from collider to non collider or trigger to non trigger
+    public void SortColliderTrigger() {
+        cTrigger = new List<SphCircle>();
+        gTrigger = new List<SphGon>();
+        sTrigger = new List<SphShape>();
+
+        circleC = new List<SphCircle>();
+        gonC = new List<SphGon>();
+        shapeC = new List<SphShape>();
+
+        // circles
+        for (int j = 0; j < sphCircles.Count; j++) {
+            if (sphCircles[j].isCollider) {
+                circleC.Add(sphCircles[j]);
+            }
+            if (sphCircles[j].isTrigger) {
+                cTrigger.Add(sphCircles[j]);
+            }
+        }
+
+        // ngons
+        for (int j = 0; j < sphGons.Count; j++) {
+            if (sphGons[j].isCollider) {
+                gonC.Add(sphGons[j]);
+            }
+            if (sphGons[j].isTrigger) {
+                gTrigger.Add(sphGons[j]);
+            }
+        }
+
+        // shapes
+        for (int j = 0; j < sphShapes.Count; j++) {
+            if (sphShapes[j].isCollider) {
+                shapeC.Add(sphShapes[j]);
+            }
+            if (sphShapes[j].isTrigger) {
+                sTrigger.Add(sphShapes[j]);
+            }
+        }
+    }
 
     // checks if circle collides with colliders (returns with first collision found)
     public bool CollideCircle(Vector3 center, float r, bool triggerStuff=false) {

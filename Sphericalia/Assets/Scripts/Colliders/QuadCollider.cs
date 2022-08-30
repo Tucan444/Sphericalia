@@ -12,9 +12,12 @@ public class QuadCollider
 
     public QuadS q;
 
-    SphericalUtilities su = new SphericalUtilities();
+    bool empty = false;
 
-    public QuadCollider(Vector3[] verts, Color c_) {
+    SphericalUtilities su = new SphericalUtilities();
+    EmptyObjects eo = new EmptyObjects();
+
+    public QuadCollider(Vector3[] verts, Color c_, bool empty_=false) {
         c = c_;
         points = (Vector3[])verts.Clone();
         normals = new Vector3[points.Length];
@@ -23,9 +26,13 @@ public class QuadCollider
 
         ComputeNormalsAndMids();
         CreateQuad();
+
+        empty = empty_;
+        if (empty) {q = eo.GetEmptyQuad();}
     }
 
     public void Update(Vector3[] verts, Color c_) {
+        empty = false;
         c = c_;
         points = (Vector3[])verts.Clone();
         normals = new Vector3[points.Length];
@@ -85,6 +92,7 @@ public class QuadCollider
     }
 
     public bool CollidePoint(Vector3 p) {
+        if (empty) {return false;}
 
         for (int i = 0; i < points.Length; i++) {
             if (Vector3.Dot(normals[i], p - mids[i]) > 0) {
@@ -96,6 +104,7 @@ public class QuadCollider
     }
 
     public bool CollideCircle(Vector3 center, float r) {
+        if (empty) {return false;}
         if (CollidePoint(center)) {return true;}
 
         for (int i = 0; i < points.Length; i++) {

@@ -14,6 +14,7 @@ public class SphGon : MonoBehaviour
     [Range(-180, 180)] public float rotation = 0;
     [Range(0.01f, -0.001f + Mathf.PI*0.5f)] public float scale = 0.1f;
     public Color color =  new Color(0.69f, 0.48f, 0.41f, 1);
+    public bool empty = false;
 
     [HideInInspector] public Vector3 position;
     [HideInInspector] public Vector3[] vertices;
@@ -36,12 +37,14 @@ public class SphGon : MonoBehaviour
     }
 
     void OnDrawGizmos() {
-        Gizmos.color = color * 1.4f;
-        su.GizmosDrawPoints(vertices);
-        Gizmos.color = color * 1.2f;
-        su.GizmosDrawPoints(GetVerticesScaled(0.9f));
-        Gizmos.color = color;
-        su.GizmosDrawPoints(GetVerticesScaled(0.8f));
+        if (!empty) {
+            Gizmos.color = color * 1.4f;
+            su.GizmosDrawPoints(vertices);
+            Gizmos.color = color * 1.2f;
+            su.GizmosDrawPoints(GetVerticesScaled(0.9f));
+            Gizmos.color = color;
+            su.GizmosDrawPoints(GetVerticesScaled(0.8f));
+        }
     }
 
     Vector3[] GetVerticesScaled(float s) {
@@ -76,8 +79,13 @@ public class SphGon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        collider_ = new ConvexCollider(vertices, color);
+        collider_ = new ConvexCollider(vertices, color, empty);
         if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
+    }
+
+    public void MakeNonEmpty() {
+        empty = false;
+        collider_.Update(vertices, color);
     }
 
     // Update is called once per frame
@@ -132,4 +140,7 @@ public class SphGon : MonoBehaviour
         collider_.Update(vertices, color);
         Warning();
     }
+
+    public void ToggleCollider() {isCollider = !isCollider;}
+    public void ToggleTrigger() {isTrigger = !isTrigger;}
 }

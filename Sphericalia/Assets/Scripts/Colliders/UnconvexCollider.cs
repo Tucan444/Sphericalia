@@ -14,10 +14,12 @@ public class UnconvexCollider
 
     public TriangleS[] triangles;
     Color color;
+    bool empty = false;
 
     SphericalUtilities su = new SphericalUtilities();
+    EmptyObjects eo = new EmptyObjects();
 
-    public UnconvexCollider(Vector3[] points_, Color c_) {
+    public UnconvexCollider(Vector3[] points_, Color c_, bool empty_ = false) {
         points = (Vector3[])points_.Clone();
         color = c_;
         
@@ -27,9 +29,17 @@ public class UnconvexCollider
 
         currentShapes.Add(points);
         GetTriangles();
+
+        empty = empty_;
+        if (empty) {
+            for (int i = 0; i < triangles.Length; i++) {
+                triangles[i] = eo.GetEmptyTriangle();
+            }
+        }
     }
 
     public void Update(Vector3[] points_, Color c_) {
+        empty = false;
         points = (Vector3[])points_.Clone();
         color = c_;
         
@@ -266,6 +276,8 @@ public class UnconvexCollider
     }
 
     public bool CollidePoint(Vector3 p) {
+        if (empty) {return false;}
+
         for (int i = 0; i < finalShapes.Count; i++) {
             if (finalShapes[i].CollidePoint(p)) {
                 return true;
@@ -275,6 +287,7 @@ public class UnconvexCollider
     }
 
     public bool CollideCircle(Vector3 center, float r) {
+        if (empty) {return false;}
         for (int i = 0; i < finalShapes.Count; i++) {
             if (finalShapes[i].CollideCircle(center, r)) {return true;}
         }

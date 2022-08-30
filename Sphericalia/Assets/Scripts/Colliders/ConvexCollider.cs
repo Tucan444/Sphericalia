@@ -13,9 +13,12 @@ public class ConvexCollider
     public TriangleS[] triangles;
     public QuadS[] quads;
 
-    SphericalUtilities su = new SphericalUtilities();
+    bool empty = false;
 
-    public ConvexCollider(Vector3[] points_, Color c_) {
+    SphericalUtilities su = new SphericalUtilities();
+    EmptyObjects eo = new EmptyObjects();
+
+    public ConvexCollider(Vector3[] points_, Color c_, bool empty_=false) {
         points = (Vector3[])points_.Clone();
         mids = new Vector3[points.Length];
         normals = new Vector3[points.Length];
@@ -24,9 +27,21 @@ public class ConvexCollider
         ComputeNormalsAndMids();
 
         ComputeObjects();
+
+        empty = empty_;
+        if (empty) {
+            for (int i = 0; i < triangles.Length; i++) {
+                triangles[i] = eo.GetEmptyTriangle();
+            }
+            for (int i = 0; i < quads.Length; i++)
+            {
+                quads[i] = eo.GetEmptyQuad();
+            }   
+        }
     }
 
     public void Update(Vector3[] points_, Color c_) {
+        empty = false;
         points = (Vector3[])points_.Clone();
         mids = new Vector3[points.Length];
         normals = new Vector3[points.Length];
@@ -167,6 +182,7 @@ public class ConvexCollider
     }
 
     public bool CollidePoint(Vector3 p) {
+        if (empty) {return false;}
 
         for (int i = 0; i < points.Length; i++) {
             if (Vector3.Dot(normals[i], p - mids[i]) > 0) {
@@ -178,6 +194,7 @@ public class ConvexCollider
     }
 
     public bool CollideCircle(Vector3 center, float r) {
+        if (empty) {return false;}
         if (CollidePoint(center)) {return true;}
 
         for (int i = 0; i < points.Length; i++) {

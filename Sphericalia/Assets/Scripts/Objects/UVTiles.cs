@@ -15,6 +15,7 @@ public class UVTiles : MonoBehaviour
     public Texture2D tiles;
     [Range(1, 5)] public int optimizeKernelSize = 2;
     [Range(0, 1)] public float optimizeScope = 0.6f;
+    public bool empty = false;
 
     [HideInInspector] public Vector3 position = new Vector3(1, 0, 0);
 
@@ -113,6 +114,7 @@ public class UVTiles : MonoBehaviour
         ss.isTrigger = isTrigger;
         ss.sphPosition = center;
         ss.color = color;
+        ss.empty = empty;
         ss.polarVertices = new Vector2[polarCorners.Length];
         for (int ii = 0; ii < polarCorners.Length; ii++) {
             ss.polarVertices[ii] = polarCorners[ii];
@@ -198,6 +200,7 @@ public class UVTiles : MonoBehaviour
         ss.isTrigger = isTrigger;
         ss.sphPosition = center;
         ss.color = color;
+        ss.empty = empty;
         ss.polarVertices = new Vector2[4] {polarCorners[0], polarCorners[1], polarCorners[2], polarCorners[3]};
         ss.GetDefaultSetup();
         ss.isQuad = true;
@@ -254,7 +257,13 @@ public class UVTiles : MonoBehaviour
         for (int i = 0; i < shapes_.Length; i++) {
             if (shapes_[i].position.x != 10) { shapes[j] = shapes_[i]; j++;}
         }
-        Debug.Log(shapes.Length);
+    }
+
+    public void MakeNonEmpty() 
+    {
+        for (int i = 0; i < shapes.Length; i++) {
+            shapes[i].MakeNonEmpty();
+        }
     }
 
     void Update() {
@@ -289,9 +298,13 @@ public class UVTiles : MonoBehaviour
     }
 
     public void Scale(float s) {
-        for (int i = 0; i < shapes.Length; i++)
-        {
-            shapes[i].Scale(s);
-        }
+        for (int i = 0; i < shapes.Length; i++){ shapes[i].Scale(s); }
+    }
+
+    public void ToggleCollider() {
+        for (int i = 0; i < shapes.Length; i++){ shapes[i].ToggleCollider(); }
+    }
+    public void ToggleTrigger() {
+        for (int i = 0; i < shapes.Length; i++){ shapes[i].ToggleTrigger(); }
     }
 }

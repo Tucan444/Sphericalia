@@ -12,6 +12,7 @@ public class SphCircle : MonoBehaviour
     public Vector2 sphPosition = new Vector2();
     [Range(0.01f, -0.01f + Mathf.PI)] public float radius = 0.1f;
     public Color color =  new Color(0.69f, 0.48f, 0.41f, 1);
+    public bool empty = false;
 
     [HideInInspector] public Vector3 position = new Vector3(1, 0, 0);
 
@@ -45,12 +46,14 @@ public class SphCircle : MonoBehaviour
     
 
     void OnDrawGizmos() {
-        Gizmos.color = color * 1.4f;
-        su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), radius));
-        Gizmos.color = color * 1.2f;
-        su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), radius * 0.9f));
-        Gizmos.color = color;
-        su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), radius * 0.8f));
+        if (!empty) {
+            Gizmos.color = color * 1.4f;
+            su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), radius));
+            Gizmos.color = color * 1.2f;
+            su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), radius * 0.9f));
+            Gizmos.color = color;
+            su.GizmosDrawPoints(su.GetCirclePoints(su.Cartesian2Spherical(position), radius * 0.8f));
+        }
     }
 
     void OnDrawGizmosSelected() {
@@ -60,8 +63,13 @@ public class SphCircle : MonoBehaviour
 
     void Start()
     {
-        collider_ = new CircleCollider(position, radius, color);
+        collider_ = new CircleCollider(position, radius, color, empty);
         if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
+    }
+
+    public void MakeNonEmpty() {
+        empty = false;
+        collider_.Update(position, radius, color);
     }
 
     // Update is called once per frame
@@ -98,4 +106,7 @@ public class SphCircle : MonoBehaviour
         collider_.Update(position, radius, color);
         Warning();
     }
+
+    public void ToggleCollider() {isCollider = !isCollider;}
+    public void ToggleTrigger() {isTrigger = !isTrigger;}
 }

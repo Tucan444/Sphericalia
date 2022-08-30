@@ -22,6 +22,7 @@ public class SphShape : MonoBehaviour
     [Range(0.01f, 2)] public float scale = 0.1f;
     public Color color =  new Color(0.69f, 0.48f, 0.41f, 1);
     public bool setToNGon = false;
+    public bool empty = false;
 
     [HideInInspector] public Vector3 position = new Vector3(1, 0, 0);
     Vector2[] vertsPolarPreprocessed = new Vector2[6];
@@ -68,7 +69,9 @@ public class SphShape : MonoBehaviour
     }
 
     void OnDrawGizmos() {
-        su.GizmosDrawShape(vertPos, angles, 0.1f, scale, color);
+        if (!empty) {
+            su.GizmosDrawShape(vertPos, angles, 0.1f, scale, color);
+        }
     }
 
     void OnDrawGizmosSelected() {
@@ -94,8 +97,13 @@ public class SphShape : MonoBehaviour
     }
 
     void Start() {
-        if (isQuad) {qcollider = new QuadCollider(vertPos, color);} else {collider_ = new UnconvexCollider(vertPos, color);}
+        if (isQuad) {qcollider = new QuadCollider(vertPos, color, empty);} else {collider_ = new UnconvexCollider(vertPos, color, empty);}
         if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
+    }
+
+    public void MakeNonEmpty() {
+        empty = false;
+        if (isQuad) {qcollider.Update(vertPos, color);} else {collider_.Update(vertPos, color);}
     }
 
     void Warning() {
@@ -145,4 +153,7 @@ public class SphShape : MonoBehaviour
         } else {qcollider.Update(vertPos, color);}
         Warning();
     }
+
+    public void ToggleCollider() {isCollider = !isCollider;}
+    public void ToggleTrigger() {isTrigger = !isTrigger;}
 }
