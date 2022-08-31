@@ -259,10 +259,11 @@ public class UVTiles : MonoBehaviour
         }
     }
 
-    public void MakeNonEmpty() 
+    public void ToggleEmpty() 
     {
+        empty = !empty;
         for (int i = 0; i < shapes.Length; i++) {
-            shapes[i].MakeNonEmpty();
+            shapes[i].ToggleEmpty();
         }
     }
 

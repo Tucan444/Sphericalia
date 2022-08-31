@@ -83,9 +83,9 @@ public class SphGon : MonoBehaviour
         if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
     }
 
-    public void MakeNonEmpty() {
-        empty = false;
-        collider_.Update(vertices, color);
+    public void ToggleEmpty() {
+        empty = !empty;
+        collider_.Update(vertices, color, empty);
     }
 
     // Update is called once per frame

@@ -67,9 +67,9 @@ public class SphCircle : MonoBehaviour
         if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
     }
 
-    public void MakeNonEmpty() {
-        empty = false;
-        collider_.Update(position, radius, color);
+    public void ToggleEmpty() {
+        empty = !empty;
+        collider_.Update(position, radius, color, empty);
     }
 
     // Update is called once per frame

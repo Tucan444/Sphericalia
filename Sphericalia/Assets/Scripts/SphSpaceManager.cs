@@ -51,13 +51,18 @@ public class SphSpaceManager : MonoBehaviour
 
     // properties
     int ambientLightID = Shader.PropertyToID("ambientLight");
+    int gammaID = Shader.PropertyToID("gamma");
+
     int lightsID = Shader.PropertyToID("lights");
     int lLengthID = Shader.PropertyToID("lLength");
+    int nlLightsID = Shader.PropertyToID("nlLights");
+    int nllLengthID = Shader.PropertyToID("nllLength");
 
     int circlesID = Shader.PropertyToID("circles");
     int trianglesID = Shader.PropertyToID("triangles");
     int quadsID = Shader.PropertyToID("quads");
 
+    int layerNumsID = Shader.PropertyToID("layerNums");
     int layersID = Shader.PropertyToID("layers");
     int layLengthID = Shader.PropertyToID("layLength");
 
@@ -247,12 +252,6 @@ public class SphSpaceManager : MonoBehaviour
         }
     }
 
-    void PopulateAll() { 
-        PopulateCircles();
-
-        PopulateTrianglesAndQuads();  
-    }
-
     void UpdateNonStatic() {
         // updating non-static objects
         int[] ti = new int[3] {staticSplit[0], staticSplit[1], staticSplit[2]};
@@ -263,7 +262,7 @@ public class SphSpaceManager : MonoBehaviour
         {
             Vector3 v = staticPrimitivesSplits[i];
             // circles
-            while (ti[0] < sphCirclesS.Count && sphCircles[ti[0]].layer == layers[i]) {
+            while (ti[0] < sphCircles.Count && sphCircles[ti[0]].layer == layers[i]) {
                 circles[(int)v.x] = sphCircles[ti[0]].collider_.circleS;
                 
                 v.x++;
@@ -271,7 +270,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // gons
-            while (ti[1] < sphGonsS.Count && sphGons[ti[1]].layer == layers[i]) {
+            while (ti[1] < sphGons.Count && sphGons[ti[1]].layer == layers[i]) {
                 for (int j = 0; j < sphGons[ti[1]].collider_.triangles.Length; j++)
                 {
                     triangles[(int)v.y] = sphGons[ti[1]].collider_.triangles[j];
@@ -287,7 +286,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[2] < sphShapesS.Count && sphShapes[ti[2]].layer == layers[i]) {
+            while (ti[2] < sphShapes.Count && sphShapes[ti[2]].layer == layers[i]) {
                 if (sphShapes[ti[2]].isQuad) {
                     quads[(int)v.z] = sphShapes[ti[2]].qcollider.q;
                     v.z++;
@@ -306,8 +305,42 @@ public class SphSpaceManager : MonoBehaviour
     }
 
     // functions to use outside of class
+
+    // used for lightning
+    public SphCircle[] GetStaticCircles() {
+        SphCircle[] staticCircles = new SphCircle[staticSplit[0]];
+        for (int i = 0; i < staticSplit[0]; i++)
+        {
+            staticCircles[i] = sphCircles[i];
+        }
+        return staticCircles;
+    }
+
+    public SphGon[] GetStaticGons() {
+        SphGon[] staticGons = new SphGon[staticSplit[1]];
+        for (int i = 0; i < staticSplit[1]; i++)
+        {
+            staticGons[i] = sphGons[i];
+        }
+        return staticGons;
+    }
+
+    public SphShape[] GetStaticShapes() {
+        SphShape[] staticShapes = new SphShape[staticSplit[2]];
+        for (int i = 0; i < staticSplit[2]; i++)
+        {
+            staticShapes[i] = sphShapes[i];
+        }
+        return staticShapes;
+    }
     
     // use 4 functions below after making static empty objects non empty
+    public void PopulateAll() { 
+        PopulateCircles();
+
+        PopulateTrianglesAndQuads();  
+    }
+
     public void PopulateCircles() {
         for (int i = 0; i < sphCirclesS.Count; i++) {
             circles[i] = sphCirclesS[i].collider_.circleS;
@@ -325,7 +358,7 @@ public class SphSpaceManager : MonoBehaviour
             // static
 
             // gons
-            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i] && sphGons[ti[0]].Static) {
+            while (ti[0] < sphGonsS.Count && sphGonsS[ti[0]].layer == layers[i] && sphGonsS[ti[0]].Static) {
                 for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
                 {
                     triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
@@ -341,7 +374,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i] && sphShapes[ti[1]].Static) {
+            while (ti[1] < sphShapesS.Count && sphShapesS[ti[1]].layer == layers[i] && sphShapesS[ti[1]].Static) {
                 if (sphShapesS[ti[1]].isQuad) {
                     quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
                     processedQ++;
@@ -359,7 +392,7 @@ public class SphSpaceManager : MonoBehaviour
             // non static
 
             // gons
-            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i]) {
+            while (ti[0] < sphGonsS.Count && sphGonsS[ti[0]].layer == layers[i]) {
                 for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
                 {
                     triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
@@ -375,7 +408,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i]) {
+            while (ti[1] < sphShapesS.Count && sphShapesS[ti[1]].layer == layers[i]) {
                 if (sphShapesS[ti[1]].isQuad) {
                     quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
                     processedQ++;
@@ -402,7 +435,7 @@ public class SphSpaceManager : MonoBehaviour
             // static
 
             // gons
-            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i] && sphGons[ti[0]].Static) {
+            while (ti[0] < sphGonsS.Count && sphGonsS[ti[0]].layer == layers[i] && sphGonsS[ti[0]].Static) {
                 for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
                 {
                     triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
@@ -413,7 +446,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i] && sphShapes[ti[1]].Static) {
+            while (ti[1] < sphShapesS.Count && sphShapesS[ti[1]].layer == layers[i] && sphShapesS[ti[1]].Static) {
                 if (!sphShapesS[ti[1]].isQuad) {
                     for (int jj = 0; jj < sphShapesS[ti[1]].collider_.triangles.Length; jj++)
                     {
@@ -428,7 +461,7 @@ public class SphSpaceManager : MonoBehaviour
             // non static
 
             // gons
-            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i]) {
+            while (ti[0] < sphGonsS.Count && sphGonsS[ti[0]].layer == layers[i]) {
                 for (int jj = 0; jj < sphGonsS[ti[0]].collider_.triangles.Length; jj++)
                 {
                     triangles[processedT] = sphGonsS[ti[0]].collider_.triangles[jj];
@@ -439,7 +472,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i]) {
+            while (ti[1] < sphShapesS.Count && sphShapesS[ti[1]].layer == layers[i]) {
                 if (!sphShapesS[ti[1]].isQuad) {
                     for (int jj = 0; jj < sphShapesS[ti[1]].collider_.triangles.Length; jj++)
                     {
@@ -463,7 +496,7 @@ public class SphSpaceManager : MonoBehaviour
             // static
 
             // gons
-            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i] && sphGons[ti[0]].Static) {
+            while (ti[0] < sphGonsS.Count && sphGonsS[ti[0]].layer == layers[i] && sphGonsS[ti[0]].Static) {
                 for (int jj = 0; jj < sphGonsS[ti[0]].collider_.quads.Length; jj++)
                 {
                     quads[processedQ] = sphGonsS[ti[0]].collider_.quads[jj];
@@ -474,7 +507,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i] && sphShapes[ti[1]].Static) {
+            while (ti[1] < sphShapesS.Count && sphShapesS[ti[1]].layer == layers[i] && sphShapesS[ti[1]].Static) {
                 if (sphShapesS[ti[1]].isQuad) {
                     quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
                     processedQ++;
@@ -486,7 +519,7 @@ public class SphSpaceManager : MonoBehaviour
             // non static
 
             // gons
-            while (ti[0] < sphGonsS.Count && sphGons[ti[0]].layer == layers[i]) {
+            while (ti[0] < sphGonsS.Count && sphGonsS[ti[0]].layer == layers[i]) {
                 for (int jj = 0; jj < sphGonsS[ti[0]].collider_.quads.Length; jj++)
                 {
                     quads[processedQ] = sphGonsS[ti[0]].collider_.quads[jj];
@@ -497,7 +530,7 @@ public class SphSpaceManager : MonoBehaviour
             }
 
             // shapes
-            while (ti[1] < sphShapesS.Count && sphShapes[ti[1]].layer == layers[i]) {
+            while (ti[1] < sphShapesS.Count && sphShapesS[ti[1]].layer == layers[i]) {
                 if (sphShapesS[ti[1]].isQuad) {
                     quads[processedQ] = sphShapesS[ti[1]].qcollider.q;
                     processedQ++;
@@ -776,12 +809,22 @@ public class SphSpaceManager : MonoBehaviour
     void RenderRealtimeLightingShader() {
 
         // setting lighting
-        realtimeLightingShader.SetFloat(ambientLightID, lighting.ambientLight);
-        PointLightS[] lights = lighting.GetStructs();
-        ComputeBuffer lights_buffer = new ComputeBuffer(lights.Length, sizeof(float)*9); // point lights
+        realtimeLightingShader.SetVector(ambientLightID, lighting.ambientLight);
+        realtimeLightingShader.SetFloat(gammaID, 1 / ((1.2f * lighting.gammaCorrection) + 1));
+
+        // linear point lights
+        PointLightS[] lights = lighting.GetLinearStructs();
+        ComputeBuffer lights_buffer = new ComputeBuffer(lights.Length, sizeof(float)*10 + sizeof(int)); // point lights
         lights_buffer.SetData(lights);
         realtimeLightingShader.SetBuffer(0, lightsID, lights_buffer);
         realtimeLightingShader.SetInt(lLengthID, lights.Length);
+
+        // nonLinear point lights
+        NlPointLightS[] lights_ = lighting.GetNonLinearStructs();
+        ComputeBuffer nlLights_buffer = new ComputeBuffer(lights_.Length, sizeof(float)*9 + sizeof(int)*2); // point lights
+        nlLights_buffer.SetData(lights_);
+        realtimeLightingShader.SetBuffer(0, nlLightsID, nlLights_buffer);
+        realtimeLightingShader.SetInt(nllLengthID, lights_.Length);
 
         // sending objects
         // circles
@@ -817,14 +860,22 @@ public class SphSpaceManager : MonoBehaviour
         Debug.Log("Number of circles: " + circles.Length + " Triangles: " + triangles.Length + " Quads: " + quads.Length);
 
         // sending layers
-        ComputeBuffer layers_buffer = new ComputeBuffer(1, sizeof(float)*3); // quads
+        ComputeBuffer layerNums_buffer = new ComputeBuffer(1, sizeof(int)); 
+        layerNums_buffer.SetData(new int[1] {0});
+
+        ComputeBuffer layers_buffer = new ComputeBuffer(1, sizeof(float)*3);
         layers_buffer.SetData(new Vector3[1] {new Vector3(0, 0, 0)});
         if(layers.Count > 0) {
             layers_buffer.Dispose();
-            layers_buffer = new ComputeBuffer(layerSplits.Length, sizeof(float)*3); // quads
+            layers_buffer = new ComputeBuffer(layerSplits.Length, sizeof(float)*3); 
             layers_buffer.SetData(layerSplits);
+
+            layerNums_buffer.Dispose();
+            layerNums_buffer = new ComputeBuffer(layers.Count, sizeof(int));
+            layerNums_buffer.SetData(layers);
         }
         realtimeLightingShader.SetBuffer(0, layersID, layers_buffer);
+        realtimeLightingShader.SetBuffer(0, layerNumsID, layerNums_buffer);
         realtimeLightingShader.SetInt(layLengthID, layers.Count);
 
         // sending bg data
@@ -857,9 +908,11 @@ public class SphSpaceManager : MonoBehaviour
 
         // disposing of buffers
         lights_buffer.Dispose();
+        nlLights_buffer.Dispose();
         circles_buffer.Dispose();
         triangles_buffer.Dispose();
         quads_buffer.Dispose();
+        layerNums_buffer.Dispose();
         layers_buffer.Dispose();
         rays_buffer.Dispose();
     }

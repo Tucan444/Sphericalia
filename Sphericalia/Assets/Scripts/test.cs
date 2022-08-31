@@ -6,9 +6,9 @@ using UnityEngine;
 public class test : MonoBehaviour
 {
     public SphericalCamera camera;
+    public SphCircle cc;
     public SphGon gon;
     public UVTiles uvs;
-    public UVTiles hehe;
     float Rad2Deg = 180.0f / Mathf.PI;
 
     float tp = 0;
@@ -20,18 +20,18 @@ public class test : MonoBehaviour
     void Start() {
         camera = GetComponent<SphericalCamera>();
         gon = GetComponent<SphGon>();
+        //cc = GetComponent<SphCircle>();
         ssm = GameObject.Find("___SphericalSpace___").GetComponent<SphSpaceManager>();
     }
 
     void Update() {
         tp += Time.deltaTime;
         if (tp > 4) {//shap.MakeNonEmpty(); 
-        uvs.MakeNonEmpty();
-        hehe.ToggleCollider();
+        /* uvs.ToggleEmpty();
         gon.ToggleTrigger();
-        ssm.PopulateTrianglesAndQuads();
-        ssm.SortColliderTrigger();
-        tp = -50;}
+        ssm.PopulateAll();
+        ssm.SortColliderTrigger(); */
+        tp = -20;}
 
 
 
@@ -45,9 +45,5 @@ public class test : MonoBehaviour
         {
             Debug.Log(gonss[i].gameObject.name);
         }
-
-
-
-        //uvs.Move(camera.position, Rad2Deg * 0.1f * Time.deltaTime);
     }
 }

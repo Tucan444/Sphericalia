@@ -101,9 +101,9 @@ public class SphShape : MonoBehaviour
         if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
     }
 
-    public void MakeNonEmpty() {
-        empty = false;
-        if (isQuad) {qcollider.Update(vertPos, color);} else {collider_.Update(vertPos, color);}
+    public void ToggleEmpty() {
+        empty = !empty;
+        if (isQuad) {qcollider.Update(vertPos, color, empty);} else {collider_.Update(vertPos, color, empty);}
     }
 
     void Warning() {
