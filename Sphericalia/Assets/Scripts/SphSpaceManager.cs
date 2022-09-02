@@ -41,6 +41,7 @@ public class SphSpaceManager : MonoBehaviour
 
     public ComputeShader baseShader;
     public ComputeShader realtimeLightingShader;
+    public ComputeShader mixedLightingShader;
     private RenderTexture renderTexture;
 
     Texture2D black;
@@ -52,6 +53,11 @@ public class SphSpaceManager : MonoBehaviour
     // properties
     int ambientLightID = Shader.PropertyToID("ambientLight");
     int gammaID = Shader.PropertyToID("gamma");
+
+    int lightLayersID = Shader.PropertyToID("lightLayers");
+    int lightmapID = Shader.PropertyToID("lightmaps");
+    int lightmapStepID = Shader.PropertyToID("lightmapStep");
+    int lightmapsDepthID = Shader.PropertyToID("lightmapsDepth");
 
     int lightsID = Shader.PropertyToID("lights");
     int lLengthID = Shader.PropertyToID("lLength");
@@ -306,30 +312,36 @@ public class SphSpaceManager : MonoBehaviour
 
     // functions to use outside of class
 
-    // used for lightning
-    public SphCircle[] GetStaticCircles() {
-        SphCircle[] staticCircles = new SphCircle[staticSplit[0]];
-        for (int i = 0; i < staticSplit[0]; i++)
+    // used for lightning (dont use ingame, used for baking lighting in editor)
+    public List<SphCircle> GetStaticCircles() {
+        List<SphCircle> staticCircles = new List<SphCircle>();
+        for (int i = 0; i < sphCircles.Count; i++)
         {
-            staticCircles[i] = sphCircles[i];
+            if (sphCircles[i].Static) {
+                staticCircles.Add(sphCircles[i]);
+            }
         }
         return staticCircles;
     }
 
-    public SphGon[] GetStaticGons() {
-        SphGon[] staticGons = new SphGon[staticSplit[1]];
-        for (int i = 0; i < staticSplit[1]; i++)
+    public List<SphGon> GetStaticGons() {
+        List<SphGon> staticGons = new List<SphGon>();
+        for (int i = 0; i < sphGons.Count; i++)
         {
-            staticGons[i] = sphGons[i];
+            if (sphGons[i].Static) {
+                staticGons.Add(sphGons[i]);
+            }
         }
         return staticGons;
     }
 
-    public SphShape[] GetStaticShapes() {
-        SphShape[] staticShapes = new SphShape[staticSplit[2]];
-        for (int i = 0; i < staticSplit[2]; i++)
+    public List<SphShape> GetStaticShapes() {
+        List<SphShape> staticShapes = new List<SphShape>();
+        for (int i = 0; i < sphShapes.Count; i++)
         {
-            staticShapes[i] = sphShapes[i];
+            if (sphShapes[i].Static) {
+                staticShapes.Add(sphShapes[i]);
+            }
         }
         return staticShapes;
     }
@@ -807,7 +819,6 @@ public class SphSpaceManager : MonoBehaviour
     }
 
     void RenderRealtimeLightingShader() {
-
         // setting lighting
         realtimeLightingShader.SetVector(ambientLightID, lighting.ambientLight);
         realtimeLightingShader.SetFloat(gammaID, 1 / ((1.2f * lighting.gammaCorrection) + 1));
@@ -917,12 +928,133 @@ public class SphSpaceManager : MonoBehaviour
         rays_buffer.Dispose();
     }
 
+    void RenderMixedLightingShader() {
+        // setting lighting
+        mixedLightingShader.SetVector(ambientLightID, lighting.ambientLight);
+        mixedLightingShader.SetFloat(gammaID, 1 / ((1.2f * lighting.gammaCorrection) + 1));
+
+        // lightmap
+        ComputeBuffer lightLayers_buffer = new ComputeBuffer(lighting.lightLayers.Count, sizeof(int));
+        lightLayers_buffer.SetData(lighting.lightLayers);
+        mixedLightingShader.SetBuffer(0, lightLayersID, lightLayers_buffer);
+        mixedLightingShader.SetTexture(0, lightmapID, lighting.lightmaps);
+        mixedLightingShader.SetVector(lightmapStepID, lighting.lightmapStep);
+        mixedLightingShader.SetInt(lightmapsDepthID, lighting.lightmaps.depth);
+
+        // linear point lights
+        PointLightS[] lights = lighting.GetLinearStructs();
+        ComputeBuffer lights_buffer = new ComputeBuffer(lights.Length, sizeof(float)*10 + sizeof(int)); // point lights
+        lights_buffer.SetData(lights);
+        mixedLightingShader.SetBuffer(0, lightsID, lights_buffer);
+        mixedLightingShader.SetInt(lLengthID, lights.Length);
+
+        // nonLinear point lights
+        NlPointLightS[] lights_ = lighting.GetNonLinearStructs();
+        ComputeBuffer nlLights_buffer = new ComputeBuffer(lights_.Length, sizeof(float)*9 + sizeof(int)*2); // point lights
+        nlLights_buffer.SetData(lights_);
+        mixedLightingShader.SetBuffer(0, nlLightsID, nlLights_buffer);
+        mixedLightingShader.SetInt(nllLengthID, lights_.Length);
+
+        // sending objects
+        // circles
+        ComputeBuffer circles_buffer = new ComputeBuffer(1, sizeof(float)*8); // circles
+        circles_buffer.SetData(new CircleS[1] {eo.GetEmptyCircle()});
+        if (circles.Length > 0) {
+            circles_buffer.Dispose();
+            circles_buffer = new ComputeBuffer(circles.Length, sizeof(float)*8); // circles
+            circles_buffer.SetData(circles);
+        }
+        mixedLightingShader.SetBuffer(0, circlesID, circles_buffer);
+
+        // triangles
+        ComputeBuffer triangles_buffer = new ComputeBuffer(1, sizeof(float)*22); // triangles
+        triangles_buffer.SetData(new TriangleS[1] {eo.GetEmptyTriangle()});
+        if (triangles.Length > 0) {
+            triangles_buffer.Dispose();
+            triangles_buffer = new ComputeBuffer(triangles.Length, sizeof(float)*22); // triangles
+            triangles_buffer.SetData(triangles);
+        }
+        mixedLightingShader.SetBuffer(0, trianglesID, triangles_buffer);
+
+        // quads
+        ComputeBuffer quads_buffer = new ComputeBuffer(1, sizeof(float)*28); // quads
+        quads_buffer.SetData(new QuadS[1] {eo.GetEmptyQuad()});
+        if(quads.Length > 0) {
+            quads_buffer.Dispose();
+            quads_buffer = new ComputeBuffer(quads.Length, sizeof(float)*28); // quads
+            quads_buffer.SetData(quads);
+        }
+        mixedLightingShader.SetBuffer(0, quadsID, quads_buffer);
+
+        Debug.Log("Number of circles: " + circles.Length + " Triangles: " + triangles.Length + " Quads: " + quads.Length);
+
+        // sending layers
+        ComputeBuffer layerNums_buffer = new ComputeBuffer(1, sizeof(int)); 
+        layerNums_buffer.SetData(new int[1] {0});
+
+        ComputeBuffer layers_buffer = new ComputeBuffer(1, sizeof(float)*3);
+        layers_buffer.SetData(new Vector3[1] {new Vector3(0, 0, 0)});
+        if(layers.Count > 0) {
+            layers_buffer.Dispose();
+            layers_buffer = new ComputeBuffer(layerSplits.Length, sizeof(float)*3); 
+            layers_buffer.SetData(layerSplits);
+
+            layerNums_buffer.Dispose();
+            layerNums_buffer = new ComputeBuffer(layers.Count, sizeof(int));
+            layerNums_buffer.SetData(layers);
+        }
+        mixedLightingShader.SetBuffer(0, layersID, layers_buffer);
+        mixedLightingShader.SetBuffer(0, layerNumsID, layerNums_buffer);
+        mixedLightingShader.SetInt(layLengthID, layers.Count);
+
+        // sending bg data
+        mixedLightingShader.SetVector(bgColorID, sb.bgColor);
+        mixedLightingShader.SetVector(orthoBgID, sb.orthoBg);
+        if (sb.bgTexture) {
+            mixedLightingShader.SetBool(useBgTextureID, true);
+            mixedLightingShader.SetTexture(0, bgTextureID, sb.bgTexture);
+            mixedLightingShader.SetVector(bgStepID, new Vector2(tau / (float)sb.bgTexture.width, Mathf.PI / (float)sb.bgTexture.height));
+        } else {
+            mixedLightingShader.SetBool(useBgTextureID, false);
+            mixedLightingShader.SetTexture(0, bgTextureID, black);
+            mixedLightingShader.SetVector(bgStepID, new Vector2(0, 0));
+        }
+
+        // sending rays
+        mixedLightingShader.SetMatrix(screenQID, Matrix4x4.TRS(new Vector3(), sc.screenQ, new Vector3(1, 1, 1)));
+
+        ComputeBuffer rays_buffer = new ComputeBuffer(sc.sendRays.Length, sizeof(float)*3);
+        rays_buffer.SetData(sc.sendRays);
+        mixedLightingShader.SetBuffer(0, sendRaysID, rays_buffer);
+
+        mixedLightingShader.SetInts(resolutionID, sc.resolution);
+
+        // sending texture
+        mixedLightingShader.SetTexture(0, resultID, renderTexture);
+
+        // dispatching
+        mixedLightingShader.Dispatch(0, sc.resolution[0] / 32, sc.resolution[1] / 32, 1);
+
+        // disposing of buffers
+        lightLayers_buffer.Dispose();
+        lights_buffer.Dispose();
+        nlLights_buffer.Dispose();
+        circles_buffer.Dispose();
+        triangles_buffer.Dispose();
+        quads_buffer.Dispose();
+        layerNums_buffer.Dispose();
+        layers_buffer.Dispose();
+        rays_buffer.Dispose();
+    }
+
     private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
         if (!lighting.useLighting) {
             RenderBaseShader();
         } else {
-            RenderRealtimeLightingShader();
+            if (!lighting.useBakedLighting) {
+                RenderRealtimeLightingShader();
+            } else {RenderMixedLightingShader();}
         }
         Graphics.Blit(renderTexture, dest);
     }

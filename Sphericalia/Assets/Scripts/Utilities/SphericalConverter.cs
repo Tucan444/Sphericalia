@@ -28,12 +28,10 @@ public class SphericalConverter
     // converts cartesian to spherical
     public Vector2 Cartesian2Spherical(Vector3 v) {
         Vector2 position = new Vector2(0, 0);
-        Vector3 v_ = new Vector3(v[0], v[1], v[2]);
 
-        v_ /= v_.magnitude;
-        position[1] = Mathf.Asin(v_[1]);
-        float cosOfz = Mathf.Cos(v_[1]);
-        position[0] = Mathf.Atan2(v_[2] / cosOfz, v_[0] / cosOfz);
+        position[1] = Mathf.Asin(v[1]);
+        float cosOfz = Mathf.Cos(v[1]);
+        position[0] = Mathf.Atan2(v[2] / cosOfz, v[0] / cosOfz);
 
         return position;
     }

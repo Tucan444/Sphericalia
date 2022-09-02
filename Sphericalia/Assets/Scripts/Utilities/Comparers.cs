@@ -74,3 +74,12 @@ public class Shape1Comparer : IComparer<SphShape> // -1 y>x      1 x>y
         } else if (!x.Static) {return 1;} else {return -1;}
     }
 }
+
+public class LLayerComparer : IComparer<PointLight> // -1 y>x      1 x>y
+{
+    public int Compare(PointLight x, PointLight y)
+    {
+        if (x.layer == y.layer) {return 0;}
+        else if (x.layer > y.layer) {return 1;} else {return -1;}
+    }
+}

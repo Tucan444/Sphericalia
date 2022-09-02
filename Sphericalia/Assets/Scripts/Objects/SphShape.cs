@@ -27,7 +27,7 @@ public class SphShape : MonoBehaviour
     [HideInInspector] public Vector3 position = new Vector3(1, 0, 0);
     Vector2[] vertsPolarPreprocessed = new Vector2[6];
     Vector2[] vertsPolarProcessed = new Vector2[6];
-    Vector3[] vertPos = new Vector3[6];
+    [HideInInspector] public Vector3[] vertPos = new Vector3[6];
     float[] angles = new float[6];
 
     [HideInInspector] public bool isQuad = false;

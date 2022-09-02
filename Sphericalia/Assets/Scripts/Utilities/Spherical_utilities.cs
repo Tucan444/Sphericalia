@@ -49,8 +49,8 @@ public class SphericalUtilities : SphericalAdder{
 
         if (Mathf.Abs(cspher.y) > r) {return false;}
 
-        Vector2 circleLine = CrampSpherical(new Vector2(cspher.x, 0));
-        Vector2 line = CrampSpherical(new Vector2(Cartesian2Spherical(a).x, Cartesian2Spherical(b).x));
+        Vector2 circleLine = new Vector2(cspher.x, 0);
+        Vector2 line = new Vector2(Cartesian2Spherical(a).x, Cartesian2Spherical(b).x);
 
         if (Mathf.Abs(line.x - line.y) > Mathf.PI) { // correction for ring space
             if (line.x < 0) {line.x += TAU;}
@@ -59,6 +59,41 @@ public class SphericalUtilities : SphericalAdder{
         }
 
         if (Mathf.Min(line.x, line.y) < circleLine.x && circleLine.x < Mathf.Max(line.x, line.y)) {return true;}
+        return false;
+    }
+
+    // checks collision between ray and line
+    public bool LineLineCollision(Vector3 a, Vector3 b, Vector3 v, Vector3 l) {
+        Quaternion q = LerpQuaternion(v, new Vector3(1, 0, 0), 1);
+        v = q * v;
+        l = q * l;
+
+        Quaternion qq;
+        if (Cartesian2Spherical(l)[1] >= 0) {
+            qq = Quaternion.AngleAxis(Rad2Deg * GetAngleBetween(l, v, Spherical2Cartesian(new Vector2(1, 0))), v);
+        } else {
+            qq = Quaternion.AngleAxis(Rad2Deg * -GetAngleBetween(l, v, Spherical2Cartesian(new Vector2(1, 0))), v);
+        }
+
+        a = qq * (q * a);
+        b = qq * (q * b);
+        v = qq * v;
+        l = qq * l;
+
+        if ((a.y < 0 && b.y < 0) || (a.y > 0 && b.y > 0)) {return false;}
+
+        Vector3 dir = (b-a).normalized;
+        Vector2 ispher = Cartesian2Spherical((a + (dir * -(a.y / dir.y))).normalized); // getting lines intersection to xy plane ring
+
+        Vector2 line = new Vector2(Cartesian2Spherical(v).x, Cartesian2Spherical(l).x);
+
+        if (Mathf.Abs(line.x - line.y) > Mathf.PI) { // correction for ring space
+            if (line.x < 0) {line.x += TAU;}
+            if (line.y < 0) {line.y += TAU;}
+            if (ispher.x < 0) {ispher.x += TAU;}
+        }
+
+        if (Mathf.Min(line.x, line.y) < ispher.x && ispher.x < Mathf.Max(line.x, line.y)) {return true;}
         return false;
     }
 

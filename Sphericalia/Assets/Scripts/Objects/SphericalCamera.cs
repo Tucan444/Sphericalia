@@ -6,15 +6,15 @@ using UnityEngine.InputSystem;
 public class SphericalCamera : MonoBehaviour
 {
     public enum Projection {
-        Gue, Stereographic, Gnomic, Orthographic, Equirectangular
+        Stereographic, Gnomic, Orthographic, Equirectangular, Gue
     };
-    public Projection projection = Projection.Gue;
+    public Projection projection = Projection.Stereographic;
     public int[] resolution = new int[2] {640, 480};
     public Vector2 sphericalPosition = new Vector2();
     [SerializeField][Range(-Mathf.PI, Mathf.PI)]public float directionRotation = 0;
-    [SerializeField][Range(0.01f, 200)]public float speed = 5;
-    [SerializeField][Range(0.01f, 360)]public float turnSpeed = 45;
-    [SerializeField] public float width = 1.2f;
+    [SerializeField][Range(0.01f, 200)]public float speed = 40;
+    [SerializeField][Range(0.01f, 360)]public float turnSpeed = 180;
+    [SerializeField] public float width = 3.3f;
     [SerializeField][Range(0.1f, 3)]public float screenSpeed = 1;
     public bool isCollider = true;
     public bool triggers = true;
