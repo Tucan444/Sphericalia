@@ -338,8 +338,6 @@
 -r:"C:/Users/ben44/Documents/Unity/Sphericalia/Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll"
 -r:"C:/Users/ben44/Documents/Unity/Sphericalia/Library/PackageCache/com.unity.nuget.newtonsoft-json@3.0.2/Runtime/Newtonsoft.Json.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.ref.dll"
--r:"Library/Bee/artifacts/1900b0aE.dag/PathCreator.ref.dll"
--r:"Library/Bee/artifacts/1900b0aE.dag/PathCreatorEditor.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.InputSystem.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.PlasticSCM.Editor.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.Rider.Editor.ref.dll"
@@ -356,9 +354,10 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEditor.UI.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.TestRunner.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
-"Assets/Editor/AddObject.cs"
-"Assets/Editor/ShapeEditor.cs"
-"Assets/PathCreator/Examples/Scripts/Editor/PathSceneToolEditor.cs"
+"Assets/Editor/Sphericalia/AddObject.cs"
+"Assets/Editor/Sphericalia/LightingEditor.cs"
+"Assets/Editor/Sphericalia/PointLightEditor.cs"
+"Assets/Editor/Sphericalia/ShapeEditor.cs"
 -langversion:9.0
 
 /deterministic

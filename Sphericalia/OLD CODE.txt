@@ -38,3 +38,86 @@ public void RenderLine(Vector3 v0, Vector3 v1, Vector3 offset, bool shortest_pat
 
     this.lines_n++;
 }
+
+
+just in case
+
+            for (int x = 0; x < resolution[0]; x++)
+            {
+                for (int y = 0; y < resolution[1]; y++)
+                {
+                    Vector2 sphPos = start + new Vector2(step.x * (0.5f + x), step.y * (0.5f + y)); // spherical position of pixel being calculated
+                    Vector3 pos = su.Spherical2Cartesian(sphPos);
+
+                    for (int i = 0; i < lights.Count; i++)
+                    {
+                        PointLight l = lights[i];
+                        if (lights[i].bakedLighting) {
+                            bool collided = false;
+
+                            // checking collisions with circles
+                            for (int j = 0; j < circles.Count; j++)
+                            {
+                                if (!(circles[j].layer > l.layer)) {
+                                    if (!collided) {
+                                        collided = su.CircleLineCollision(circles[j].position, circles[j].radius, pos, l.position);
+                                    } else {break;}
+                                }
+                            }
+
+                            // checking collisions with gons
+                            for (int j = 0; j < gons.Count; j++)
+                            {
+                                for (int jj = 0; jj < gons[j].vertices.Length; jj++)
+                                {
+                                    if (!collided || !(gons[j].layer > l.layer)){
+                                        collided = su.LineLineCollision(gons[j].vertices[jj], gons[j].vertices[(jj+1) % gons[j].vertices.Length], pos, l.position);
+                                    } else {break;}
+                                }
+                            }
+
+                            // checking collisions with shapes
+                            for (int j = 0; j < shapes.Count; j++)
+                            {
+                                for (int jj = 0; jj < shapes[j].vertPos.Length; jj++)
+                                {
+                                    if (!collided || !(shapes[j].layer > l.layer)){
+                                        collided = su.LineLineCollision(shapes[j].vertPos[jj], shapes[j].vertPos[(jj+1) % shapes[j].vertPos.Length], pos, l.position);
+                                    } else {break;}
+                                }
+                            }
+
+                            // calculating lighting
+                            Color c = Color.black;
+                            if (!collided) {
+                                if (l.linear) {
+                                    float top;
+                                    float slope;
+                                    if (l.boundary > l.radius) {
+                                        top = l.boundary * (l.power / (l.boundary - l.radius));
+                                        slope = top/l.boundary;
+                                    } else {
+                                        top = l.power + 10;
+                                        slope = 0.01f;
+                                    }
+
+                                    c = l.color * Mathf.Min(l.power, Mathf.Max(0, top - (Mathf.Acos(Vector3.Dot(pos, l.position)) * slope)));
+                                } else {
+                                    int fallout = 1;
+                                    if (l._3D) { fallout = 2; }
+
+                                    c = l.color * (l.power / Mathf.Pow(Mathf.Max(1, Mathf.Acos(Vector3.Dot(pos, l.position)) + 1 - l.radius), fallout));
+                                }
+                            }
+
+                            // adding color to pixel
+                            Color pixColor = texture.GetPixel(x, y);
+
+                            texture.SetPixel(x, y, pixColor + c);
+                        }
+                    }
+                }
+                Debug.Log(0.01f * Mathf.Round(10000 * ((x+1) / (float)resolution[0])) + "% done");
+            }
+            texture.Apply();
+            return texture;
