@@ -13,7 +13,6 @@
 -a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\Unity.InputSystem.dll"
 -a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\Unity.Services.Core.Internal.dll"
 -a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\UnityEngine.UI.dll"
--a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\PathCreator.dll"
 -a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\Unity.Services.Core.Configuration.dll"
 -a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\Unity.Services.Core.dll"
 -a="C:\Users\ben44\Documents\Unity\Sphericalia\Library\PlayerScriptAssemblies\Unity.Services.Core.Device.dll"

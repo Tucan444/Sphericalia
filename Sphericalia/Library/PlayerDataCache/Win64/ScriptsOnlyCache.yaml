@@ -4,6 +4,7 @@ ScriptsOnlyBuild:
     - AddObject
     Assembly-CSharp.dll:
     - Lighting
+    - Player
     - PointLight
     - SphBg
     - SphCircle
@@ -12,7 +13,6 @@ ScriptsOnlyBuild:
     - SphSpaceManager
     - SphericalCamera
     - UVTiles
-    - test
     Unity.InputSystem.dll:
     - UnityEngine.InputSystem.InputActionAsset
     - UnityEngine.InputSystem.InputSettings
@@ -30,12 +30,10 @@ ScriptsOnlyBuild:
     - UnityEngine.InputSystem.InputAction
     - UnityEngine.InputSystem.InputActionMap
     - UnityEngine.InputSystem.InputBinding
-    - UnityEngine.InputSystem.InputSettings/iOSSettings
     - UnityEngine.InputSystem.PlayerInput/ActionEvent
     - UnityEngine.InputSystem.PlayerInput/ControlsChangedEvent
     - UnityEngine.InputSystem.PlayerInput/DeviceLostEvent
     - UnityEngine.InputSystem.PlayerInput/DeviceRegainedEvent
-    - UnityEngine.InputSystem.iOS.PrivacyDataUsage
     UnityEngine.CoreModule:
     - UnityEngine.Events.ArgumentCache
     - UnityEngine.Events.PersistentCallGroup
@@ -76,29 +74,29 @@ ScriptsOnlyBuild:
     - Class: 104
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 1580}
+      Script: {instanceID: 1578}
     - Class: 114
-      Script: {instanceID: 1830}
+      Script: {instanceID: 1828}
     - Class: 114
-      Script: {instanceID: 2160}
+      Script: {instanceID: 2154}
     - Class: 114
-      Script: {instanceID: 2326}
+      Script: {instanceID: 2318}
     - Class: 114
-      Script: {instanceID: 2944}
+      Script: {instanceID: 2926}
     - Class: 114
-      Script: {instanceID: 3180}
+      Script: {instanceID: 3160}
     - Class: 114
-      Script: {instanceID: 3464}
+      Script: {instanceID: 3444}
     - Class: 114
-      Script: {instanceID: 3658}
+      Script: {instanceID: 3634}
     - Class: 114
-      Script: {instanceID: 3812}
+      Script: {instanceID: 3766}
     - Class: 114
-      Script: {instanceID: 4210}
+      Script: {instanceID: 4184}
     - Class: 114
-      Script: {instanceID: 5170}
+      Script: {instanceID: 5128}
     - Class: 114
-      Script: {instanceID: 5398}
+      Script: {instanceID: 5356}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 135
@@ -122,12 +120,6 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: AnimationPlayableAsset
-  - hash:
-      serializedVersion: 2
-      Hash: 14285c3bd5db9ec1880c467fd290624a
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: PathCreation.Examples
-    className: PathSpawner
   - hash:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
@@ -208,12 +200,6 @@ ScriptsOnlyBuild:
     className: Lighting
   - hash:
       serializedVersion: 2
-      Hash: b233df5c6f9cea11b87e4e515556b495
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: PathCreation.Examples
-    className: GeneratePathExample
-  - hash:
-      serializedVersion: 2
       Hash: caa533b001ae39b864ba8425019e2268
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
@@ -292,12 +278,6 @@ ScriptsOnlyBuild:
     className: PlayerInputManagerEditor
   - hash:
       serializedVersion: 2
-      Hash: 5455126194c7fb60e2136719105446c8
-    assemblyName: PathCreator.dll
-    namespaceName: PathCreation
-    className: PathCreator
-  - hash:
-      serializedVersion: 2
       Hash: a1aa98c78061c6f03a8c124cda576e67
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
@@ -314,12 +294,6 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.EventSystems
     className: EventSystem
-  - hash:
-      serializedVersion: 2
-      Hash: 0eaba8fcbfa6859be3e02bfe60166ccf
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: PathCreation.Examples
-    className: PathPlacer
   - hash:
       serializedVersion: 2
       Hash: fe64a45214940b510a0ec79c96d43498
@@ -346,7 +320,7 @@ ScriptsOnlyBuild:
     className: TextMeshProUGUI
   - hash:
       serializedVersion: 2
-      Hash: 7f13e6baaf69e38caaf1fb2c7a0fe346
+      Hash: 7a27c3cc640201706dad5e46e17bf1d7
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: UVTiles
@@ -388,16 +362,10 @@ ScriptsOnlyBuild:
     className: TestResultRendererCallback
   - hash:
       serializedVersion: 2
-      Hash: 61a8f8ce94b9457d9af1c79ba08598c5
+      Hash: d99f97d5f057eccd2d81988fc74fd48d
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: SphCircle
-  - hash:
-      serializedVersion: 2
-      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: Spherical_utilities
   - hash:
       serializedVersion: 2
       Hash: e09e8bebc0fcd32bb8af1287a6b44816
@@ -490,7 +458,7 @@ ScriptsOnlyBuild:
     className: DownloadableSample
   - hash:
       serializedVersion: 2
-      Hash: 5adbb92b6483678659aab21600bb5b97
+      Hash: 33e9583d3c54be9a2fb1e9392efc7604
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: SphShape
@@ -526,16 +494,16 @@ ScriptsOnlyBuild:
     className: PlayableTrack
   - hash:
       serializedVersion: 2
+      Hash: 23f6a9e656c75a718a5922bfc730d596
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: Player
+  - hash:
+      serializedVersion: 2
       Hash: 3164bc883ff663a5cdb32d1ef7e7c0c5
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
     className: VerticalLayoutGroup
-  - hash:
-      serializedVersion: 2
-      Hash: db731057de82af1b01a123a31064b7fc
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: test
   - hash:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
@@ -646,12 +614,6 @@ ScriptsOnlyBuild:
     className: InputDebuggerWindow
   - hash:
       serializedVersion: 2
-      Hash: 2023515a447b9089d205e8fe2ea2e7ac
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: PathCreation.Examples
-    className: PathFollower
-  - hash:
-      serializedVersion: 2
       Hash: c3d3430df9e3ea95e3e3d587961390fb
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
@@ -718,12 +680,6 @@ ScriptsOnlyBuild:
     className: TMP_Settings
   - hash:
       serializedVersion: 2
-      Hash: 1532436743ef194dbf67c97ed7b8e9f1
-    assemblyName: PathCreator.dll
-    namespaceName: PathCreation
-    className: GlobalDisplaySettings
-  - hash:
-      serializedVersion: 2
       Hash: c1f5356fcd27668ddc25078e27f9828d
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem.UI
@@ -760,7 +716,7 @@ ScriptsOnlyBuild:
     className: TMP_ScrollbarEventHandler
   - hash:
       serializedVersion: 2
-      Hash: d15683daa8500bf9677ae5123736b4ea
+      Hash: 48d5bdb7943d2e783700f0ae55131366
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: SphGon
@@ -800,12 +756,6 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: ActivationPlayableAsset
-  - hash:
-      serializedVersion: 2
-      Hash: bfd0fa381ea0fbb32773b78e2b1e2c06
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: PathCreation.Examples
-    className: RoadMeshCreator
   - hash:
       serializedVersion: 2
       Hash: 7ab0e790220bdca831fdd886b339039d
