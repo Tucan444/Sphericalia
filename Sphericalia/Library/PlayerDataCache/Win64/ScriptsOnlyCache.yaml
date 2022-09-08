@@ -74,29 +74,29 @@ ScriptsOnlyBuild:
     - Class: 104
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 1578}
+      Script: {instanceID: 1580}
     - Class: 114
-      Script: {instanceID: 1828}
+      Script: {instanceID: 1830}
     - Class: 114
-      Script: {instanceID: 2154}
+      Script: {instanceID: 2156}
     - Class: 114
-      Script: {instanceID: 2318}
+      Script: {instanceID: 2320}
     - Class: 114
-      Script: {instanceID: 2926}
+      Script: {instanceID: 2928}
     - Class: 114
-      Script: {instanceID: 3160}
+      Script: {instanceID: 3162}
     - Class: 114
-      Script: {instanceID: 3444}
+      Script: {instanceID: 3446}
     - Class: 114
-      Script: {instanceID: 3634}
+      Script: {instanceID: 3636}
     - Class: 114
-      Script: {instanceID: 3766}
+      Script: {instanceID: 3768}
     - Class: 114
-      Script: {instanceID: 4184}
+      Script: {instanceID: 4186}
     - Class: 114
-      Script: {instanceID: 5128}
+      Script: {instanceID: 5130}
     - Class: 114
-      Script: {instanceID: 5356}
+      Script: {instanceID: 5358}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 135
@@ -242,7 +242,7 @@ ScriptsOnlyBuild:
     className: Text
   - hash:
       serializedVersion: 2
-      Hash: 4df9a59035d961f5f3f87347625fd431
+      Hash: 3b2b4ccf67d1cc68d4b26929ff620851
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: SphericalCamera
@@ -777,4 +777,4 @@ ScriptsOnlyBuild:
   platform: 19
   scenePathNames:
   - Assets/Scenes/SampleScene.unity
-  playerPath: C:/Users/ben44/Documents/Unity/Sphericalia/Build/Sphericalia.exe
+  playerPath: C:/Users/ben44/Documents/Unity/Tools/Sphericalia/Build/Sphericalia.exe

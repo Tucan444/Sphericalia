@@ -101,6 +101,7 @@ public class SphSpaceManager : MonoBehaviour
 
         renderTexture = new RenderTexture(sc.resolution[0], sc.resolution[1], 24);
         renderTexture.enableRandomWrite = true;
+        renderTexture.filterMode = FilterMode.Point;
         renderTexture.Create();
 
         black = Texture2D.blackTexture;
