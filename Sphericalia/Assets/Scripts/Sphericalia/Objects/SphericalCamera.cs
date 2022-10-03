@@ -268,15 +268,18 @@ public class SphericalCamera : MonoBehaviour
             } else {Move(playerInput[1] * speed * Time.deltaTime);}
             Rotate(playerInput[0] * turnSpeed * Time.deltaTime);
         } else {
-            if (playerInput.sqrMagnitude > 0) {
-                float angleA = -su.Rad2Deg * (Mathf.Atan2(playerInput.y, playerInput.x) - su.HalfPI);
-                qq = Quaternion.AngleAxis(angleA, position);
-                direction = qq * direction;
-                if (isCollider) {
-                    MoveWithCollision(speed * Time.deltaTime);
-                } else {Move(speed * Time.deltaTime);}
-                qq = Quaternion.identity;
-            }
+            float angleA = -su.Rad2Deg * (Mathf.Atan2(playerInput.y, playerInput.x) - su.HalfPI);
+            qq = Quaternion.AngleAxis(angleA, position);
+
+            direction = qq * direction;
+
+            float norm = 0;
+            if (playerInput.sqrMagnitude > 0) { norm = 1; }
+            if (isCollider) {
+                MoveWithCollision(norm * speed * Time.deltaTime);
+            } else {Move(norm * speed * Time.deltaTime);}
+
+            qq = Quaternion.identity;
         }
 
         if (triggers) {
@@ -317,6 +320,10 @@ public class SphericalCamera : MonoBehaviour
 
     public void Move(float rAngle) {
         moveQ = Quaternion.AngleAxis(rAngle, Vector3.Cross(position, direction)) * GetMoves();
+        if (float.IsNaN(moveQ.x)) {
+            moveQ = GetMoves();
+        }
+
         position = moveQ * position;
         direction = moveQ * (Quaternion.Inverse(qq) * direction);
 
@@ -338,6 +345,10 @@ public class SphericalCamera : MonoBehaviour
         Quaternion cameraMovesQ = GetMoves();
         Quaternion[] variants = GetMovesVariants(rotQ); 
         moveQ = Quaternion.AngleAxis(rAngle, Vector3.Cross(position, direction)) * cameraMovesQ;
+        if (float.IsNaN(moveQ.x)) {
+            moveQ = cameraMovesQ;
+        }
+
         Quaternion moveQ1 = Quaternion.AngleAxis(rAngle*0.5f, Vector3.Cross(position, rotQ[0] * direction)) * variants[0];
         Quaternion moveQ2 = Quaternion.AngleAxis(rAngle*0.75f, Vector3.Cross(position, rotQ[1] * direction)) * variants[1];
         Quaternion moveQ3 = Quaternion.AngleAxis(-rAngle*0.75f, Vector3.Cross(position, rotQ[1] * direction)) * variants[2];
@@ -346,6 +357,7 @@ public class SphericalCamera : MonoBehaviour
 
         if (checks[2]) {
             if (checks[0] && checks[1] && checks[3] && checks[4]) {
+                direction = Quaternion.Inverse(qq) * direction;
                 return;
             } else if (!checks[1]) {moveQ = moveQ2;
             } else if (!checks[3]) {moveQ = moveQ3;
@@ -371,13 +383,15 @@ public class SphericalCamera : MonoBehaviour
 
     public void Rotate(float rAngle) {
         Q = Quaternion.AngleAxis(rAngle, position);
-        direction = Q * direction;
+        if (!float.IsNaN(Q.x)) {
+            direction = Q * direction;
 
-        totalQ = Q * totalQ;
-        if (pinScreenToPlayer) {
-            screenQ = totalQ;
-        } else {
-            screenQ = Quaternion.Lerp(screenQ, totalQ, Mathf.Min((0.1f * speed) * screenSpeed * screenSpeed * Time.deltaTime, 1));
+            totalQ = Q * totalQ;
+            if (pinScreenToPlayer) {
+                screenQ = totalQ;
+            } else {
+                screenQ = Quaternion.Lerp(screenQ, totalQ, Mathf.Min((0.1f * speed) * screenSpeed * screenSpeed * Time.deltaTime, 1));
+            }
         }
     }
 
@@ -397,9 +411,15 @@ public class SphericalCamera : MonoBehaviour
     }
 
     // alings direction in opposite of target
-    public void AlignDirectionAgainstTarget(Vector3 target, float t) {
-        float d = su.SphDistance(direction, su.GetPlaneVector(position, su.SphLerp(target, position, 2)));
-        Rotate(su.Rad2Deg * d * t);
+    public void AlignDirectionAgainstTarget(Vector3 target, float t, bool flip=false) {
+        Vector3 pv = su.GetPlaneVector(position, su.SphLerp(position, target, 1));
+
+        int sign = 1;
+        if (Vector3.Dot(Vector3.Cross(position, direction), pv) > 0 ) {sign = -1;}
+        float angleR = Mathf.PI - su.SphDistance(direction, pv);
+
+        //if (flip) {sign *= -1;}
+        Rotate(su.Rad2Deg * t * angleR * sign);
     }
 
     public void OnMovement(InputAction.CallbackContext context) {
