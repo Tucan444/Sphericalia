@@ -64,3 +64,19 @@ The setting 3D in non-linear lights changes fallof from 1/d to 1/(d**2).
 <p id="scripting"><p/>
 
 ## Scripting
+
+This part looks into usefull functions in the engine.
+
+### Spherical utilities
+
+This part looks at files in the **Utilities** folder.
+
+The files well look into are:
+- spherical utilities
+- spherical common functions
+- spherical adder
+- spherical converter
+
+These follow the inheritance *utilities < common functions < adder < converter*.
+
+
