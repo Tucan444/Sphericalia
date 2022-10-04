@@ -418,7 +418,10 @@ public class SphericalCamera : MonoBehaviour
         if (Vector3.Dot(Vector3.Cross(position, direction), pv) > 0 ) {sign = -1;}
         float angleR = Mathf.PI - su.SphDistance(direction, pv);
 
-        //if (flip) {sign *= -1;}
+        if (flip) {
+            angleR = Mathf.PI - angleR;
+            sign *= -1;
+        }
         Rotate(su.Rad2Deg * t * angleR * sign);
     }
 

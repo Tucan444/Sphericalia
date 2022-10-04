@@ -796,6 +796,9 @@ public class SphSpaceManager : MonoBehaviour
         }
     }
 
+    // end
+    // internal functions below
+
     // Update is called once per frame
     void Update()
     {
