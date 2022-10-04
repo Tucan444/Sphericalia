@@ -51,7 +51,7 @@ These shapes are currently available:
 - general shape
 - uv tiles
 
-Triggers and empty objects will be covered in the script part.
+[Triggers](#ssm) and empty objects will be covered in the script part.
 
 #### Lights
 
@@ -84,7 +84,9 @@ There are also functions for collisions, intersections, raycasts in utilities fi
 To convert between coordinates look at converter.
 Adder contains functions usefull for positioning objects on a sphere.
 
-### Objects
+### Spherical Camera
+
+### Objects <span id="objScript"><span/>
 
 For *circle, ngon, general shape, uv tiles* there are functions for their manipulation:
 - move
@@ -95,8 +97,8 @@ For *circle, ngon, general shape, uv tiles* there are functions for their manipu
 - toggle invisible/empty
 
 *Move, rotate, scale and change color* require the object to be non-static.
-After *toggle collider/trigger* ssm.SortColliderTrigger() has to be used.
-After *toggle invisible/empty* one of ssm.Populate() methods need to be used if object is non-static.
+After *toggle collider/trigger* [`ssm.SortColliderTrigger()`](#ssm) has to be used.
+After *toggle invisible/empty* one of [`ssm.Populate()`](#ssm) methods need to be used if object is non-static.
 
 ### Lights
 
@@ -107,8 +109,34 @@ Functions for point lights:
 
 If you change sphPosition call `Setup()` afterwards.
 
+<p id="ssm"><p/>
+
 ### Spherical Space Manager (ssm)
 
 This file functions as the core of the engine pulling everything together. <br>
 Its located on the ___SphericalSpace___ game object. <br>
 To get it use public variable or `GameObject.Find("___SphericalSpace___").GetComponent<SphSpaceManager>()`.
+
+Usefull functions in this class include:
+- get static \[circles, gons, shapes]
+- populate \[all, circles, triangles & quads, triangles, quads]
+- sort collider trigger
+- collide circle
+- collide trigger circle
+- ray cast triggers/colliders
+- get triggered \[circles, gons, shapes, uv tiles]
+- clear triggered
+
+Get static functions are not optimal but are fast enough as they were intended for editor, light baking. <br>
+Populate refreshes all of said type, use when changing static object or using *toggle invisible/empty* on static objects. These functions are expensive. <br>
+Use sort collider after using *toggle collider/trigger*. Can get expensive with many colliders/triggers. Try using only once per frame.<br>
+Collider/ray cast functions work scene-wise. <br>
+
+### Adding objects
+
+If you want to generate objects before game please have a look at [uvTiles file](https://github.com/Tucan444/Sphericalia/blob/main/Sphericalia/Assets/Scripts/Sphericalia/Objects/UVTiles.cs). <br>
+
+There is currently no way of adding new objects at runtime. <br>
+Use empty objects for this, they act as if they werent there until [`.ToggleEmpty()`](#objScript) is called.
+
+## Owari
