@@ -86,6 +86,15 @@ Adder contains functions usefull for positioning objects on a sphere.
 
 ### Spherical Camera
 
+Usefull functionalities of spherical camera:
+- get mouse pos
+- align direction against target
+- camera moves
+
+Mouse pos is returned as point on a sphere, if not returns (10, 0, 0). <br>
+Align direction makes camera look away from some point. *t* goes from 0 to 1 with 1 completly aligning the direction. Fliping points camera towards the point. <br>
+Moving camera is expinsive so instead use `sphericalCam.cameraMoves.Add( new CameraMovement(origin, direction, distance) )`.
+
 ### Objects <span id="objScript"><span/>
 
 For *circle, ngon, general shape, uv tiles* there are functions for their manipulation:
