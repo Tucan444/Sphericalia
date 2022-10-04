@@ -7,7 +7,8 @@ For example heres a [spherical maze](https://www.youtube.com/watch?v=6ry3OA6xEv0
 
 ## Quick Documentation
 
-This mainly contains tips that are not obvious.
+This mainly contains tips that are not obvious. <br>
+[skip to scripting](#scripting)
 
 ### Getting started
 
@@ -39,5 +40,27 @@ There are 3 core objects that you need to know.
 
 #### Shapes
 
-To add shapes use object adder window. (should be at the bottom shelf) <br>
-If the window isnt presend you can open it by Spherical>AddObject.
+To add shapes use object adder window in the bottom shelf. <br>
+If the window isnt presend you can open it by Spherical>AddObject. <br>
+I suggest first creating object and then configuring position, rotation, scale ... as the drawn preview isnt completely responsive. <br>
+Batch generation is possible here. <br>
+
+These shapes are currently available:
+- circle
+- ngon
+- general shape
+- uv tiles
+
+Triggers and empty objects will be covered in the script part.
+
+#### Lights
+
+All light objects are located under lighting object. <br>
+To add a light open lighting object in inspector and click on add point light. <br>
+
+Most important setting for point lights is **linear** that completly changes behaivour. <br>
+The setting 3D in non-linear lights changes fallof from 1/d to 1/(d**2).
+
+<p id="scripting"><p/>
+
+## Scripting
