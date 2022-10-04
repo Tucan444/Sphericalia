@@ -23,7 +23,7 @@ public class PointLight : MonoBehaviour
 
     SphericalUtilities su = new SphericalUtilities();
 
-    void Setup() {
+    public void Setup() {
         position = su.Spherical2Cartesian(sphPosition);
     }
 
