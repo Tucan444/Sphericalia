@@ -13,11 +13,10 @@ public class QuadCollider
 
     public QuadS q;
 
-    bool invisible = false;
-    bool empty = false;
+    public bool invisible = false;
+    public bool empty = false;
 
     SphericalUtilities su = new SphericalUtilities();
-    EmptyObjects eo = new EmptyObjects();
 
     public QuadCollider(Vector3[] verts, Color c_, bool invisible_=false, bool empty_=false) {
         c = c_;
@@ -32,7 +31,6 @@ public class QuadCollider
 
         invisible = invisible_;
         empty = empty_;
-        if (empty || invisible) {q = eo.GetEmptyQuad();}
     }
 
     public void Update(Vector3[] verts, Color c_, bool invisible_=false, bool empty_=false) {
@@ -48,7 +46,6 @@ public class QuadCollider
 
         invisible = invisible_;
         empty = empty_;
-        if (empty || invisible) {q = eo.GetEmptyQuad();}
     }
 
     public void MoveRotate(Quaternion qua) {

@@ -152,7 +152,6 @@ public class SphericalUtilities : SphericalCommonFunctions{
         float tt = TAU - RayCircleCast(a, -b, center, r);
 
         float length = SphDistance(a, b);
-        Quaternion q;
 
         if (t <= length) {
             intersections[0] = RayTravel(a, b, t);

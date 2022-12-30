@@ -36,11 +36,13 @@ public class SphShape : MonoBehaviour
     [HideInInspector] public QuadCollider qcollider;
 
     [HideInInspector] public bool triggered = false;
+    [HideInInspector] public bool terminated = false;
 
     // for shape editor
     [HideInInspector] public float handlesRadius = 0.03f;
 
     SphericalUtilities su = new SphericalUtilities();
+    SphSpaceManager ssm;
 
     public void GetDefaultSetup() {
         if (setToNGon) {
@@ -88,31 +90,46 @@ public class SphShape : MonoBehaviour
     }
 
     void OnEnable() {
-        SphSpaceManager.sphShapes.Add(this);
+        ssm = GameObject.Find("___SphericalSpace___").GetComponent<SphSpaceManager>();
+        
         if (transform.parent == null) {
             transform.parent = GameObject.Find("___SphericalSpace___").transform;
         }
         GetDefaultSetup();
         transform.position = position;
+        terminated = false;
     }
 
     void OnDisable() {
         SphSpaceManager.sphShapes.Remove(this);
+        if (isCollider) {ssm.shapeC.Remove(this);}
+        if (isTrigger) {ssm.sTrigger.Remove(this);}
+        terminated = true;
     }
 
     void Start() {
         if (isQuad) {qcollider = new QuadCollider(vertPos, color, invisible, empty);} else {collider_ = new UnconvexCollider(vertPos, color, invisible, empty);}
-        if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
+
+        if (!ssm.initialized) {
+            SphSpaceManager.sphShapes.Add(this);
+            if (!ssm.layers.Contains(layer)) {ssm.layers.Add(layer);}
+        } else {
+            ssm.InsertShape(this);
+            ssm.InsertLayer(layer);
+
+            if (isCollider) {ssm.shapeC.Add(this);}
+            if (isTrigger) {ssm.sTrigger.Add(this);}
+        }
     }
 
     public void ToggleEmpty() {
         empty = !empty;
-        if (isQuad) {qcollider.Update(vertPos, color, invisible, empty);} else {collider_.Update(vertPos, color, invisible, empty);}
+        collider_.empty = empty;
     }
 
     public void ToggleInvisible() {
         invisible = !invisible;
-        if (isQuad) {qcollider.Update(vertPos, color, invisible, empty);} else {collider_.Update(vertPos, color, invisible, empty);}
+        collider_.invisible = invisible;
     }
 
     void Warning() {

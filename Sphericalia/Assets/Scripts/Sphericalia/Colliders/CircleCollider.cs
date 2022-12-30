@@ -7,11 +7,10 @@ public class CircleCollider
     Vector3 center;
     float r;
     public CircleS circleS;
-    bool invisible;
-    bool empty;
+    public bool invisible;
+    public bool empty;
 
     SphericalUtilities su = new SphericalUtilities();
-    EmptyObjects eo = new EmptyObjects();
 
     public CircleCollider(Vector3 center_, float r_, Color c, bool invisible_=false, bool empty_=false) {
         center = center_;
@@ -23,10 +22,6 @@ public class CircleCollider
 
         invisible = invisible_;
         empty = empty_;
-
-        if (empty || invisible) {
-            circleS = eo.GetEmptyCircle();
-        }
     }
 
     public bool CollidePoint(Vector3 p) {
@@ -51,10 +46,6 @@ public class CircleCollider
         
         invisible = invisible_;
         empty = empty_;
-
-        if (empty || invisible) {
-            circleS = eo.GetEmptyCircle();
-        }
     }
 }
 

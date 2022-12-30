@@ -23,8 +23,10 @@ public class SphGon : MonoBehaviour
     [HideInInspector] public ConvexCollider collider_;
 
     [HideInInspector] public bool triggered = false;
+    [HideInInspector] public bool terminated = false;
 
     SphericalUtilities su = new SphericalUtilities();
+    SphSpaceManager ssm;
 
     public void GetDefaultSetup() {
         position = su.Spherical2Cartesian(sphPosition);
@@ -66,32 +68,47 @@ public class SphGon : MonoBehaviour
     }
 
     void OnEnable() {
-        SphSpaceManager.sphGons.Add(this);
+        ssm = GameObject.Find("___SphericalSpace___").GetComponent<SphSpaceManager>();
+        
         if (transform.parent == null) {
             transform.parent = GameObject.Find("___SphericalSpace___").transform;
         }
         GetDefaultSetup();
         transform.position = position;
+        terminated = false;
     }
 
     void OnDisable() {
         SphSpaceManager.sphGons.Remove(this);
+        if (isCollider) {ssm.gonC.Remove(this);}
+        if (isTrigger) {ssm.gTrigger.Remove(this);}
+        terminated = true;
     }
     // Start is called before the first frame update
     void Start()
     {
         collider_ = new ConvexCollider(vertices, color, invisible, empty);
-        if (!SphSpaceManager.layers.Contains(layer)) {SphSpaceManager.layers.Add(layer);}
+
+        if (!ssm.initialized) {
+            SphSpaceManager.sphGons.Add(this);
+            if (!ssm.layers.Contains(layer)) {ssm.layers.Add(layer);}
+        } else {
+            ssm.InsertGon(this);
+            ssm.InsertLayer(layer);
+
+            if (isCollider) {ssm.gonC.Add(this);}
+            if (isTrigger) {ssm.gTrigger.Add(this);}
+        }
     }
 
     public void ToggleEmpty() {
         empty = !empty;
-        collider_.Update(vertices, color, invisible, empty);
+        collider_.empty = empty;
     }
 
     public void ToggleInvisible() {
         invisible = !invisible;
-        collider_.Update(vertices, color, invisible, empty);
+        collider_.invisible = invisible;
     }
 
     // Update is called once per frame

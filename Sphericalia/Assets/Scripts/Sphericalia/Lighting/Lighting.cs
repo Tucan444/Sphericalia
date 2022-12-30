@@ -23,10 +23,11 @@ public class Lighting : MonoBehaviour
     [HideInInspector] public bool stopBaking = false;
 
     [HideInInspector] public bool baking = false;
+    [HideInInspector] public bool initialized = false;
 
-    List<PointLight> lights;
-    List<PointLight> linearLights;
-    List<PointLight> nonLinearLights;
+    [HideInInspector] public List<PointLight> lights;
+    [HideInInspector] public List<PointLight> linearLights;
+    [HideInInspector] public List<PointLight> nonLinearLights;
 
     [HideInInspector] public List<int> lightLayers = new List<int>();
 
@@ -51,6 +52,7 @@ public class Lighting : MonoBehaviour
         for (int i = 0; i <pointLights.Length; i++) {lights.Add(pointLights[i]);}
 
         SortLinear();
+        initialized = true;
     }
 
     public void SortLinear() {
@@ -301,7 +303,7 @@ public class Lighting : MonoBehaviour
         #if UNITY_EDITOR
         Undo.RecordObject(pl, "Created point light");
         #endif
-        obj.transform.parent = gameObject.transform;
+        obj.transform.parent = gameObject.transform;  // putting it as child in object hierarchy
 
         count++;
     }

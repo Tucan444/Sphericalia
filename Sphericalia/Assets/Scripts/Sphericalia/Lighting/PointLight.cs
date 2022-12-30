@@ -22,13 +22,36 @@ public class PointLight : MonoBehaviour
     float prevP = 0;
 
     SphericalUtilities su = new SphericalUtilities();
+    Lighting lighting;
 
     public void Setup() {
         position = su.Spherical2Cartesian(sphPosition);
     }
 
     void OnValidate() {Setup();}
-    void OnEnable() {Setup();}
+    void OnEnable() {
+        Setup();
+        lighting = GameObject.Find("___SphericalSpace___").GetComponentInChildren(typeof(Lighting)) as Lighting;
+    }
+    void OnDisable() {
+        lighting.lights.Remove(this);
+
+        if (!bakedLighting) {
+            if (linear) {lighting.linearLights.Remove(this);}
+            else {lighting.nonLinearLights.Remove(this);}
+        }
+    }
+
+    void Start() {
+        if (lighting.initialized) {
+            lighting.lights.Add(this);
+
+            if (bakedLighting) {return;}
+
+            if (linear) {lighting.linearLights.Add(this);}
+            else {lighting.nonLinearLights.Add(this);}
+        }
+    }
 
     void OnDrawGizmos() {
         if (!linear) {

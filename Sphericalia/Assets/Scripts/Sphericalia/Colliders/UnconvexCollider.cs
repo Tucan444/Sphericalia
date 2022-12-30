@@ -17,11 +17,10 @@ public class UnconvexCollider
     public TriangleS[] triangles;
     Color color;
 
-    bool invisible = false;
-    bool empty = false;
+    public bool invisible = false;
+    public bool empty = false;
 
     SphericalUtilities su = new SphericalUtilities();
-    EmptyObjects eo = new EmptyObjects();
 
     public UnconvexCollider(Vector3[] points_, Color c_, bool invisible_=false, bool empty_ = false) {
         points = (Vector3[])points_.Clone();
@@ -38,11 +37,6 @@ public class UnconvexCollider
 
         invisible = invisible_;
         empty = empty_;
-        if (empty || invisible) {
-            for (int i = 0; i < triangles.Length; i++) {
-                triangles[i] = eo.GetEmptyTriangle();
-            }
-        }
     }
 
     public void Update(Vector3[] points_, Color c_, bool invisible_=false, bool empty_ = false) {
@@ -59,11 +53,6 @@ public class UnconvexCollider
 
         invisible = invisible_;
         empty = empty_;
-        if (empty || invisible) {
-            for (int i = 0; i < triangles.Length; i++) {
-                triangles[i] = eo.GetEmptyTriangle();
-            }
-        }
     }
 
     public void MoveRotate(Quaternion q) {
