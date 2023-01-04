@@ -235,9 +235,6 @@ public class SphericalCamera : MonoBehaviour
 
             sendRays[i] = renderRays[j][ii];
         }
-
-        // setting up rigidbody
-        rigidbody.SetUp(position, direction);
     }
 
     Vector3[] GetLine(Vector3 a, Vector3 b, int n) {

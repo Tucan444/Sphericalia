@@ -17,10 +17,13 @@ public class RigidbodySpherical : MonoBehaviour
 
     [HideInInspector] public Vector3 position = new Vector3(1, 0, 0);
     [HideInInspector] public Vector3 direction = new Vector3(0, 1, 0);
-    Quaternion totalQ = Quaternion.identity;  // all movement from beggining to the end
+    [HideInInspector] public Quaternion totalQ = Quaternion.identity;  // all movement from beggining to the end
     [HideInInspector] public Quaternion movementQ = Quaternion.identity;  // quaternion for movement from beggining to end with smoothing
-    Quaternion moveQ; // last movement in total position to totalQ
-    Quaternion Q = Quaternion.identity;  // used in default setup for rotating direction
+    [HideInInspector] public Quaternion moveQ; // last movement in total position to totalQ
+    [HideInInspector] public Quaternion Q = Quaternion.identity;  // used in default setup for rotating direction
+
+    Quaternion frameQ = Quaternion.identity;
+    [HideInInspector] public Quaternion lframeQ = Quaternion.identity;
 
     private bool started = false;
 
@@ -106,7 +109,6 @@ public class RigidbodySpherical : MonoBehaviour
     void Start() {
         for (int i = 0; i < colliders.Count; i++) {
             Vector2 posAdded = su.AddSpherSpher(colliders[i].sphPosition, sphericalPosition);
-            Q = Quaternion.AngleAxis(directionRotation * (360.0f / (Mathf.PI * 2)), position);
             posAdded = su.Cartesian2Spherical(Q * su.Spherical2Cartesian(posAdded));
 
             colliders[i].sphPosition = posAdded;
@@ -122,6 +124,8 @@ public class RigidbodySpherical : MonoBehaviour
         moves = new List<SphericalMovement>();
         colliderPool.Clear();
         triggerPool.Clear();
+        lframeQ = frameQ;
+        frameQ = Quaternion.identity;
     }
 
     public Quaternion GetMoves() {
@@ -173,6 +177,8 @@ public class RigidbodySpherical : MonoBehaviour
         } else {
             MoveWithoutCollision(rAngle);
         }
+
+        frameQ = moveQ * frameQ;
     }
 
     public void Rotate(float rAngle) {
@@ -183,6 +189,7 @@ public class RigidbodySpherical : MonoBehaviour
         }
 
         additionalRotation = 0;
+        frameQ = moveQ * frameQ;
     }
 
     public void MoveWithoutCollision(float rAngle) {
@@ -279,6 +286,7 @@ public class RigidbodySpherical : MonoBehaviour
             }
 
             totalQ = Q * totalQ;
+            moveQ = Q;
             if (noSmoothing) {
                 movementQ = totalQ;
             } else {
@@ -308,6 +316,7 @@ public class RigidbodySpherical : MonoBehaviour
             }
 
             totalQ = Q * totalQ;
+            moveQ = Q;
             if (noSmoothing) {
                 movementQ = totalQ;
             } else {
