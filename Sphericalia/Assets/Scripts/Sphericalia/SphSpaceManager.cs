@@ -6,6 +6,8 @@ using UnityEditor;
 // main class
 public class SphSpaceManager : MonoBehaviour
 {
+    public bool useObjectPool = false;
+
     public static SphBg sb;
     public static SphericalCamera sc;
     public static Lighting lighting;
@@ -24,6 +26,9 @@ public class SphSpaceManager : MonoBehaviour
     [HideInInspector] public List<SphCircle> circleC = new List<SphCircle>();
     [HideInInspector] public List<SphGon> gonC = new List<SphGon>();
     [HideInInspector] public List<SphShape> shapeC = new List<SphShape>();
+
+    // object pool
+    public ObjectPool objectPool = new ObjectPool();
 
     // arrays for layer ordering
     Vector3[] layerSplits;
@@ -359,6 +364,12 @@ public class SphSpaceManager : MonoBehaviour
         PopulateCircles();
 
         PopulateTrianglesAndQuads();  
+    }
+
+    public void PopulateWithObjectPool() {
+        circles = objectPool.GetCircles(circles, layers);
+        triangles = objectPool.GetTriangles(triangles, layers);
+        quads = objectPool.GetQuads(quads, layers);
     }
 
     public void PopulateCircles() {
@@ -737,8 +748,18 @@ public class SphSpaceManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        PopulateAll();
-        GetLayerVectors();
+        if (useObjectPool) {
+            objectPool.SortLists();
+
+            layerSplits = objectPool.GetLayerVectors(layers);
+            PopulateWithObjectPool();
+            
+            objectPool.Clear();
+        } else {
+            PopulateAll();
+            GetLayerVectors();
+        }
+
         ClearTriggered();
     }
 

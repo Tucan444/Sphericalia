@@ -9,10 +9,12 @@ public class Player : MonoBehaviour  // this is custom script not a part of engi
     SphGon player;
 
     SphericalUtilities su = new SphericalUtilities();
+    SphSpaceManager ssm;
     // Start is called before the first frame update
     void Start()
     {
         sc = GetComponent<SphericalCamera>();
+        ssm = GameObject.Find("___SphericalSpace___").GetComponent<SphSpaceManager>();
     }
 
     // Update is called once per frame

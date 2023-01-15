@@ -41,7 +41,8 @@ public class SphericalConverter
     public Vector2 Cartesian2Polar(Vector3 v) {
         float rotation = Mathf.Acos(Vector3.Dot(v, Vector3.right));
         Vector3 back = Quaternion.AngleAxis(-90 + rotation * Rad2Deg, Vector3.Cross(v, Vector3.right)) * v;
-        float angle = Mathf.Acos(Vector3.Dot(Vector3.up, back));
+        float angle = Mathf.Acos(Mathf.Max(-1, Mathf.Min(1, Vector3.Dot(Vector3.up, back))));
+        
         if (back[2] < 0) {
             angle *= -1;
         }
