@@ -31,8 +31,7 @@ public class SphericalConverter
         Vector2 position = new Vector2(0, 0);
 
         position[1] = Mathf.Asin(v[1]);
-        float cosOfz = Mathf.Cos(v[1]);
-        position[0] = Mathf.Atan2(v[2] / cosOfz, v[0] / cosOfz);
+        position[0] = Mathf.Atan2(v[2], v[0]);
 
         return position;
     }
@@ -59,7 +58,7 @@ public class SphericalConverter
 
     // converts polarSpherical to spherical
     public Vector2 Polar2Spherical(Vector2 v) {
-        return Cartesian2Polar(Polar2Cartesian(v));
+        return Cartesian2Spherical(Polar2Cartesian(v));
     }
 
 
@@ -87,8 +86,7 @@ public class SphericalConverter
         position[0] = v.magnitude;
         v_ /= position[0];
         position[2] = Mathf.Asin(v_[1]);
-        float cosOfz = Mathf.Cos(v_[1]);
-        position[1] = Mathf.Atan2(v_[2] / cosOfz, v_[0] / cosOfz);
+        position[1] = Mathf.Atan2(v_[2], v_[0]);
 
         return position;
     }
