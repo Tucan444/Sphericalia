@@ -163,8 +163,12 @@ public class SphericalUtilities : SphericalCommonFunctions{
         return intersections;
     }
 
-    // calculates default normal for spherical coordinates
+    // calculates default normal for spherical coordinates // bottom hemisphere flipped
     public Vector3 GetDirection(Vector3 v) { // working
+        if (Mathf.Abs(v.y) == 1) {
+            Debug.Log("GetDirection called when starting point is on a pole: taking alpha as 0");
+            return new Vector3(-1, 0, 0);  // reversed we flip it later
+        }
         return (new Vector3(0, 1.0f / Vector3.Dot(new Vector3(0, 1, 0), v), 0) - v).normalized;
     }
 

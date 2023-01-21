@@ -113,6 +113,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 finalColor = getBgColor(raySph);
     bool collided = false;
 
+    if (isOut(ray)) { // checking if ray out
+        finalColor = orthoBg;
+        Result[id.xy] = finalColor;
+        return;
+    } 
+
     for (int u = 0; u < layLength; u++) {
         // circles
         for (int i = layers[u][0]; i < (int)layers[u+1][0]; i++) {
@@ -132,10 +138,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             finalColor = (collided * quads[k].color) + (!collided * finalColor);
         }
     }
-
-    // checking if ray out
-    collided = isOut(ray);
-    finalColor = (collided * orthoBg) + (!collided * finalColor);
 
     finalColor.a = 1;
 

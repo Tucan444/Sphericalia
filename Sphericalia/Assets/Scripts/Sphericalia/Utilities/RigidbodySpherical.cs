@@ -171,35 +171,37 @@ public class RigidbodySpherical : MonoBehaviour
         }
     }
 
-    public void Move(float rAngle) {
+    public void Move(float rAngle, Quaternion? directionCorrection=null) {
+        if (directionCorrection == null) {directionCorrection = Quaternion.identity;}
         if (isCollider) {
-            MoveWithCollision(rAngle);
+            MoveWithCollision(rAngle, (Quaternion)directionCorrection);
         } else {
-            MoveWithoutCollision(rAngle);
+            MoveWithoutCollision(rAngle, (Quaternion)directionCorrection);
         }
 
         frameQ = moveQ * frameQ;
     }
 
-    public void Rotate(float rAngle) {
+    public void Rotate(float rAngle, Quaternion? directionCorrection=null) {
+        if (directionCorrection == null) {directionCorrection = Quaternion.identity;}
         if (isCollider) {
-            RotateWithCollision(rAngle);
+            RotateWithCollision(rAngle, (Quaternion)directionCorrection);
         } else {
-            RotateWithoutCollision(rAngle);
+            RotateWithoutCollision(rAngle, (Quaternion)directionCorrection);
         }
 
         additionalRotation = 0;
         frameQ = moveQ * frameQ;
     }
 
-    public void MoveWithoutCollision(float rAngle) {
+    public void MoveWithoutCollision(float rAngle, Quaternion directionCorrection) {
         moveQ = Quaternion.AngleAxis(rAngle, Vector3.Cross(position, direction)) * GetMoves();
         if (float.IsNaN(moveQ.x)) {
             moveQ = GetMoves();
         }
 
         position = moveQ * position;
-        direction = moveQ * direction;
+        direction = moveQ * (directionCorrection * direction);
         for (int i = 0; i < colliders.Count; i++) {
             colliders[i].position = moveQ * colliders[i].position;
         }
@@ -213,7 +215,7 @@ public class RigidbodySpherical : MonoBehaviour
 
     }
 
-    public void MoveWithCollision(float rAngle) {
+    public void MoveWithCollision(float rAngle, Quaternion directionCorrection) {
         Quaternion[] rotQ = new Quaternion[2] {
             Quaternion.AngleAxis(90, position),
             Quaternion.AngleAxis(60, position)
@@ -234,7 +236,7 @@ public class RigidbodySpherical : MonoBehaviour
 
         if (checks[2]) {
             if (checks[0] && checks[1] && checks[3] && checks[4]) {
-                direction = direction;
+                direction = directionCorrection * direction;
                 return;
             } else if (!checks[1]) {moveQ = moveQ2;
             } else if (!checks[3]) {moveQ = moveQ3;
@@ -243,7 +245,7 @@ public class RigidbodySpherical : MonoBehaviour
         }
         
         position = moveQ * position;
-        direction = moveQ * direction;
+        direction = moveQ * (directionCorrection * direction);
         for (int i = 0; i < colliders.Count; i++) {
             colliders[i].position = moveQ * colliders[i].position;
         }
@@ -277,10 +279,10 @@ public class RigidbodySpherical : MonoBehaviour
         return false;
     }
 
-    public void RotateWithoutCollision(float rAngle) {
+    public void RotateWithoutCollision(float rAngle, Quaternion directionCorrection) {
         Q = Quaternion.AngleAxis(rAngle + additionalRotation, position);
         if (!float.IsNaN(Q.x)) {
-            direction = Q * direction;
+            direction = Q * (directionCorrection * direction);
             for (int i = 0; i < colliders.Count; i++) {
                 colliders[i].position = Q * colliders[i].position;
             }
@@ -295,7 +297,7 @@ public class RigidbodySpherical : MonoBehaviour
         }
     }
 
-    public void RotateWithCollision(float rAngle) {
+    public void RotateWithCollision(float rAngle, Quaternion directionCorrection) {
         Q = Quaternion.AngleAxis(rAngle + additionalRotation, position);
         Quaternion testQ = Quaternion.AngleAxis((rAngle + additionalRotation) * 0.5f, position);
 
@@ -303,6 +305,7 @@ public class RigidbodySpherical : MonoBehaviour
 
         if (checks[0]) {
             if (checks[1]) {
+                direction = directionCorrection * direction;
                 return;
             } else {
                 Q = testQ;
@@ -310,7 +313,7 @@ public class RigidbodySpherical : MonoBehaviour
         }
 
         if (!float.IsNaN(Q.x)) {
-            direction = Q * direction;
+            direction = Q * (directionCorrection * direction);
             for (int i = 0; i < colliders.Count; i++) {
                 colliders[i].position = Q * colliders[i].position;
             }

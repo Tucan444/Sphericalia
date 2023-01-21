@@ -183,6 +183,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     bool collided = false;
     int maxLayer = -99999;
 
+    if (isOut(ray)) { // checking if ray out
+        finalColor = orthoBg;
+        Result[id.xy] = finalColor;
+        return;
+    }
+
     for (int u = 0; u < layLength; u++) {
         // circles
         for (int i = layers[u][0]; i < (int)layers[u+1][0]; i++) {
@@ -208,10 +214,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     // computing lighting
     finalColor *= computeLighting(ray, raySph, maxLayer);
-
-    // checking if ray out
-    collided = isOut(ray);
-    finalColor = (collided * orthoBg) + (!collided * finalColor);
 
     finalColor.a = 1;
 

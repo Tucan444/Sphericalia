@@ -49,9 +49,8 @@ public class ControlerSpherical : MonoBehaviour
 
             float norm = 0;
             if (playerInput.sqrMagnitude > 0) { norm = 1; }
-            rigidbody.Move(norm * speed * Time.deltaTime);
+            rigidbody.Move(norm * speed * Time.deltaTime, Quaternion.Inverse(qq));
 
-            rigidbody.direction = Quaternion.Inverse(qq) * rigidbody.direction;
             qq = Quaternion.identity;
         }
 
